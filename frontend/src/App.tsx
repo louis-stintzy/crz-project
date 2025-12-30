@@ -1,25 +1,7 @@
 import { useState } from "react";
+import type { Closet, ClothingItem } from "./types/closet.types";
+
 import "./App.css";
-
-// ----- TYPE DEFINITIONS -----
-
-interface ClothingItem {
-  id: number;
-  name: string;
-  type: {
-    category: "top" | "bottom" | "shoes" | "accessory";
-    subcategory: string;
-  };
-  style: "sportswear" | "chic" | "classic" | "casual";
-  color: string;
-  isFavorite: boolean;
-  comment?: string;
-}
-
-interface Closet {
-  isOpen: boolean;
-  clothes: ClothingItem[];
-}
 
 function App() {
   // ----- STATE MANAGEMENT
