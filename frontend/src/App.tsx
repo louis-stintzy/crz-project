@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Closet, ClothingItem } from "./types/closet.types";
+import Title from "./components/Title";
 
 import "./App.css";
 
@@ -62,8 +63,7 @@ function App() {
 
   return (
     <>
-      {/* TITLE */}
-      <h1>Closet Manager</h1>
+      <Title />
       {/* INFO SECTION */}
       <div>
         <p>{infoMessage ? infoMessage : "Let's manage your closet!"}</p>
