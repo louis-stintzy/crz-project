@@ -4,6 +4,7 @@ import Title from "./components/Title";
 
 import "./App.css";
 import InfoSection from "./components/InfoSection";
+import ClosetControls from "./components/ClosetControls";
 
 function App() {
   // ----- STATE MANAGEMENT
@@ -66,17 +67,12 @@ function App() {
     <>
       <Title />
       <InfoSection infoMessage={infoMessage} />
-      {/* CLOSET CONTROLS */}
-      <div>
-        {closet.isOpen ? (
-          <>
-            <button onClick={handleAddItem}>Add Clothing Item</button>
-            <button onClick={handleCloseCloset}>Close Closet</button>
-          </>
-        ) : (
-          <button onClick={handleOpenCloset}>Open Closet</button>
-        )}
-      </div>
+      <ClosetControls
+        closetIsOpen={closet.isOpen}
+        onOpen={handleOpenCloset}
+        onClose={handleCloseCloset}
+        onAddItem={handleAddItem}
+      />
 
       {/* CLOTHING ITEMS LIST */}
       {closet.isOpen && (
