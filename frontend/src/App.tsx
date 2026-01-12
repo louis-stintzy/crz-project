@@ -3,6 +3,7 @@ import type { Closet, ClothingItem } from "./types/closet.types";
 import Title from "./components/Title";
 
 import "./App.css";
+import InfoSection from "./components/InfoSection";
 
 function App() {
   // ----- STATE MANAGEMENT
@@ -64,10 +65,7 @@ function App() {
   return (
     <>
       <Title />
-      {/* INFO SECTION */}
-      <div>
-        <p>{infoMessage ? infoMessage : "Let's manage your closet!"}</p>
-      </div>
+      <InfoSection infoMessage={infoMessage} />
       {/* CLOSET CONTROLS */}
       <div>
         {closet.isOpen ? (
