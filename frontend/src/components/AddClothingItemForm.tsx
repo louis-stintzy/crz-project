@@ -1,11 +1,11 @@
 import { useState } from "react";
 import type { ClothingItem } from "../types/closet.types";
 
-const onAdd = (item: ClothingItem) => {
-  console.log("Adding clothing item:", item);
-};
+interface AddClothingItemFormProps {
+  onAdd: (item: ClothingItem) => void;
+}
 
-function AddClothingItemForm() {
+function AddClothingItemForm({ onAdd }: AddClothingItemFormProps) {
   // ----- Form state
   const [name, setName] = useState<ClothingItem["name"]>("");
   const [category, setCategory] =
