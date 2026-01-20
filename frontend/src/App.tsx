@@ -6,6 +6,7 @@ import "./App.css";
 import InfoSection from "./components/InfoSection";
 import ClosetControls from "./components/ClosetControls";
 import Modal from "./components/Modal";
+import AddClothingItemForm from "./components/AddClothingItemForm";
 
 function App() {
   // ----- STATE MANAGEMENT
@@ -100,10 +101,10 @@ function App() {
 
       <Modal
         isOpen={isModalOpen}
-        title="Add Clothing Item"
+        title="Add Clothing Item Form"
         onClose={() => setIsModalOpen(false)}
       >
-        <p>Here you can add a new clothing item...</p>
+        <AddClothingItemForm />
       </Modal>
     </>
   );
