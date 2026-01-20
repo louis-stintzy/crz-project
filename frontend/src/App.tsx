@@ -101,7 +101,7 @@ function App() {
 
       <Modal
         isOpen={isModalOpen}
-        title="Add Clothing Item Form"
+        title="Add Clothing Item"
         onClose={() => setIsModalOpen(false)}
       >
         <AddClothingItemForm />
