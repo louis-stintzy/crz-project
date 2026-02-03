@@ -102,6 +102,7 @@ function AddClothingItemForm({ onAdd }: AddClothingItemFormProps) {
             type="text"
             value={color}
             onChange={(e) => setColor(e.target.value)}
+            required
           />
         </label>
       </div>
