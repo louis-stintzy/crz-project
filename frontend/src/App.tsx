@@ -97,11 +97,7 @@ function App() {
         title="Add Clothing Item"
         onClose={() => setIsModalOpen(false)}
       >
-        <AddClothingItemForm
-          onAdd={(newItem) => {
-            handleAddItem(newItem);
-          }}
-        />
+        <AddClothingItemForm onAdd={handleAddItem} />
       </Modal>
     </>
   );
