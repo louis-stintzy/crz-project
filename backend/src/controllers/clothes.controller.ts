@@ -1,8 +1,20 @@
 import { RequestHandler } from 'express';
+import { ClothingItem } from '../types/closet.types';
+import { clothesService } from '../services/clothes.service';
 
-const getAll: RequestHandler = (_req, res) => {
+const getAll: RequestHandler<
+  unknown,
+  ClothingItem[],
+  unknown,
+  unknown
+> = async (_req, res, next) => {
   console.log('[GET] /api/v1/clothes');
-  res.send('Get all clothes');
+  try {
+    const items = await clothesService.getAll();
+    res.status(200).json(items);
+  } catch (error) {
+    next(error);
+  }
 };
 
 const getById: RequestHandler = (req, res) => {
