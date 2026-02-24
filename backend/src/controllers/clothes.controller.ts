@@ -8,8 +8,8 @@ const getAll: RequestHandler<
   unknown,
   unknown
 > = async (_req, res, next) => {
-  console.log('[GET] /api/v1/clothes');
   try {
+    console.log('[GET] /api/v1/clothes');
     const items = await clothesService.getAll();
     res.status(200).json(items);
   } catch (error) {
@@ -17,10 +17,24 @@ const getAll: RequestHandler<
   }
 };
 
-const getById: RequestHandler = (req, res) => {
-  const { id } = req.params;
-  console.log(`[GET] /api/v1/clothes/${id}`);
-  res.send(`Get clothing item by ID: ${id}`);
+const getById: RequestHandler<
+  { id: string },
+  ClothingItem | { message: string },
+  unknown,
+  unknown
+> = async (req, res, next) => {
+  try {
+    // TODO: Validate ID format (middleware)
+    const { id } = req.params;
+    console.log(`[GET] /api/v1/clothes/${id}`);
+    const item = await clothesService.getById(id);
+    // TODO: Handle case where item is not found (service layer)
+    if (item === null)
+      res.status(404).json({ message: 'Clothing item not found' });
+    else res.status(200).json(item);
+  } catch (error) {
+    next(error);
+  }
 };
 
 const create: RequestHandler = (_req, res) => {

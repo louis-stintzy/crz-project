@@ -37,6 +37,12 @@ const findAll = async (): Promise<ClothingItem[]> => {
   });
 };
 
+const findById = async (id: string): Promise<ClothingItem | null> => {
+  const item = clothes.find((clothing) => clothing.id === Number(id));
+  return item || null;
+};
+
 export const clothesRepository = {
   findAll,
+  findById,
 };
