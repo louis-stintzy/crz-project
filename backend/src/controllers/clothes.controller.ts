@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { ClothingItem } from '../types/closet.types';
+import { ClothingItem, CreateClothingItemDTO } from '../types/closet.types';
 import { clothesService } from '../services/clothes.service';
 
 const getAll: RequestHandler<
@@ -37,9 +37,20 @@ const getById: RequestHandler<
   }
 };
 
-const create: RequestHandler = (_req, res) => {
-  console.log('[POST] /api/v1/clothes');
-  res.send('Create a new clothing item');
+const create: RequestHandler<
+  unknown,
+  ClothingItem,
+  CreateClothingItemDTO,
+  unknown
+> = async (req, res, next) => {
+  try {
+    console.log('[POST] /api/v1/clothes');
+    const newItem: CreateClothingItemDTO = req.body;
+    const createdItem: ClothingItem = await clothesService.create(newItem);
+    res.status(201).json(createdItem);
+  } catch (error) {
+    next(error);
+  }
 };
 
 const updateById: RequestHandler = (req, res) => {

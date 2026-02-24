@@ -1,4 +1,4 @@
-import { ClothingItem } from '../types/closet.types';
+import { ClothingItem, CreateClothingItemDTO } from '../types/closet.types';
 
 let clothes: ClothingItem[] = [
   {
@@ -42,7 +42,17 @@ const findById = async (id: string): Promise<ClothingItem | null> => {
   return item || null;
 };
 
+const create = async (data: CreateClothingItemDTO): Promise<ClothingItem> => {
+  const newItem = {
+    id: Date.now(),
+    ...data,
+  };
+  clothes.push(newItem);
+  return newItem;
+};
+
 export const clothesRepository = {
   findAll,
   findById,
+  create,
 };
