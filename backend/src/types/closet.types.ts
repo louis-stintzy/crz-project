@@ -18,7 +18,7 @@ export interface ClothingType {
 }
 
 export interface ClothingItem {
-  id: number;
+  id: string;
   name: string;
   type: ClothingType;
   style: (typeof CLOTHING_STYLES)[number];
