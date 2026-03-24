@@ -2,6 +2,7 @@ import { z } from 'zod';
 import {
   clothingIdParamSchema,
   createClothingItemSchema,
+  updateClothingItemSchema,
 } from '../schemas/clothes.schema';
 
 // export interface ClothingType {
@@ -21,13 +22,15 @@ import {
 
 // export type CreateClothingItemDTO = Omit<ClothingItem, 'id'>;
 
-// export type ClothingId = {
-//   id: string;
-// };
+export type ClothingIdParams = z.infer<typeof clothingIdParamSchema>;
+export type ClothingId = ClothingIdParams['id'];
 
-export type ClothingId = z.infer<typeof clothingIdParamSchema>;
 export type CreateClothingItemDTO = z.infer<typeof createClothingItemSchema>;
-export type ClothingItem = CreateClothingItemDTO & ClothingId;
+export type UpdateClothingItemDTO = z.infer<typeof updateClothingItemSchema>;
+
+export type ClothingItem = CreateClothingItemDTO & {
+  id: ClothingId;
+};
 
 export interface Closet {
   isOpen: boolean;

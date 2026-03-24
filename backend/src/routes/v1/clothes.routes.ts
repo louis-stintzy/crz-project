@@ -3,6 +3,7 @@ import { clothesController } from '../../controllers/clothes.controller';
 import {
   clothingIdParamSchema,
   createClothingItemSchema,
+  updateClothingItemSchema,
 } from '../../schemas/clothes.schema';
 import { validateBody, validateParams } from '../../middlewares/validate';
 
@@ -25,6 +26,7 @@ clothesRoutes.post(
 clothesRoutes.put(
   '/:id',
   validateParams(clothingIdParamSchema),
+  validateBody(updateClothingItemSchema),
   clothesController.updateById
 );
 

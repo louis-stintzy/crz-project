@@ -24,3 +24,12 @@ export const createClothingItemSchema = z.object({
   isFavorite: z.boolean().optional().default(false),
   comment: z.string().optional(),
 });
+
+export const updateClothingItemSchema = createClothingItemSchema;
+
+// export const updateClothingItemSchema = createClothingItemSchema
+//   .partial()
+//   .refine(
+//     (data) => Object.keys(data).length > 0,
+//     'At least one field must be provided for update'
+//   );
