@@ -3,7 +3,7 @@ import { ClothingItem, CreateClothingItemDTO } from '../types/closet.types';
 
 let clothes: ClothingItem[] = [
   {
-    id: '1',
+    id: '11111111-1111-4111-8111-111111111111',
     name: 'Red T-Shirt',
     type: { category: 'top', subcategory: 't-shirt' },
     style: 'casual',
@@ -12,7 +12,7 @@ let clothes: ClothingItem[] = [
     comment: 'My favorite red t-shirt!',
   },
   {
-    id: '2',
+    id: '22222222-2222-4222-8222-222222222222',
     name: 'Blue Jeans',
     type: { category: 'bottom', subcategory: 'jeans' },
     style: 'casual',
@@ -20,7 +20,7 @@ let clothes: ClothingItem[] = [
     isFavorite: false,
   },
   {
-    id: '3',
+    id: '33333333-3333-5333-9333-333333333333',
     name: 'White Sneakers',
     type: { category: 'shoes', subcategory: 'sneakers' },
     style: 'sportswear',

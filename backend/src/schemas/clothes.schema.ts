@@ -4,6 +4,10 @@ import {
   CLOTHING_STYLES,
 } from '../constants/clothes.constants';
 
+export const clothingIdParamSchema = z.object({
+  id: z.uuid('Invalid clothing item ID'),
+});
+
 export const clothingCategorySchema = z.enum(CLOTHING_CATEGORIES);
 export const clothingStyleSchema = z.enum(CLOTHING_STYLES).optional();
 

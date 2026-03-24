@@ -1,5 +1,8 @@
 import { z } from 'zod';
-import { createClothingItemSchema } from '../schemas/clothes.schema';
+import {
+  clothingIdParamSchema,
+  createClothingItemSchema,
+} from '../schemas/clothes.schema';
 
 // export interface ClothingType {
 //   category: (typeof CLOTHING_CATEGORIES)[number];
@@ -18,10 +21,11 @@ import { createClothingItemSchema } from '../schemas/clothes.schema';
 
 // export type CreateClothingItemDTO = Omit<ClothingItem, 'id'>;
 
-export type ClothingId = {
-  id: string;
-};
+// export type ClothingId = {
+//   id: string;
+// };
 
+export type ClothingId = z.infer<typeof clothingIdParamSchema>;
 export type CreateClothingItemDTO = z.infer<typeof createClothingItemSchema>;
 export type ClothingItem = CreateClothingItemDTO & ClothingId;
 
