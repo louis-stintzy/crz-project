@@ -1,6 +1,5 @@
 import { RequestHandler } from 'express';
 import {
-  ClothingId,
   ClothingIdParams,
   ClothingItem,
   CreateClothingItemDTO,
