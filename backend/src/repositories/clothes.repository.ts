@@ -6,7 +6,7 @@ import {
   UpdateClothingItemDTO,
 } from '../types/closet.types';
 
-let clothes: ClothingItem[] = [
+const clothes: ClothingItem[] = [
   {
     id: '11111111-1111-4111-8111-111111111111',
     name: 'Red T-Shirt',
@@ -44,8 +44,8 @@ const findAll = async (): Promise<ClothingItem[]> => {
 };
 
 const findById = async (id: ClothingId): Promise<ClothingItem | null> => {
-  const item = clothes.find((clothing) => clothing.id === id);
-  return item || null;
+  const item = await clothes.find((clothing) => clothing.id === id);
+  return item ?? null;
 };
 
 const create = async (data: CreateClothingItemDTO): Promise<ClothingItem> => {
@@ -53,7 +53,7 @@ const create = async (data: CreateClothingItemDTO): Promise<ClothingItem> => {
     id: randomUUID(),
     ...data,
   };
-  clothes.push(newItem);
+  await clothes.push(newItem);
   return newItem;
 };
 
@@ -61,7 +61,7 @@ const updateById = async (
   id: ClothingId,
   data: UpdateClothingItemDTO
 ): Promise<ClothingItem | null> => {
-  const index = clothes.findIndex((clothing) => clothing.id === id);
+  const index = await clothes.findIndex((clothing) => clothing.id === id);
   if (index === -1) return null;
   const currentItem = clothes[index] as ClothingItem;
   const updatedItem: ClothingItem = { ...currentItem, ...data };
@@ -70,7 +70,7 @@ const updateById = async (
 };
 
 const deleteById = async (id: ClothingId): Promise<boolean> => {
-  const index = clothes.findIndex((clothing) => clothing.id === id);
+  const index = await clothes.findIndex((clothing) => clothing.id === id);
   if (index === -1) return false;
   clothes.splice(index, 1);
   return true;
