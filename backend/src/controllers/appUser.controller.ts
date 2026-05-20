@@ -1,16 +1,21 @@
 import { RequestHandler } from 'express';
 import {
   AppUserIdParams,
+  AppUserPublic,
   CreateAppUserDTO,
   UpdateAppUserDTO,
 } from '../types/appUser.types';
+import { appUserService } from '../services/appUser.service';
 
-const getAll: RequestHandler<unknown, string, unknown, unknown> = (
-  _req,
-  res
-) => {
+const getAll: RequestHandler<
+  unknown,
+  AppUserPublic[],
+  unknown,
+  unknown
+> = async (_req, res) => {
   console.log('[GET] /api/v1/users');
-  res.send('Get all app users');
+  const users = await appUserService.getAll();
+  res.status(200).json(users);
 };
 
 const getById: RequestHandler<AppUserIdParams, string, unknown, unknown> = (
