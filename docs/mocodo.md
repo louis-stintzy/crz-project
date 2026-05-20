@@ -19,7 +19,7 @@ USER_CREATES_TAGS, 11 TAG, 0N APP_USER
 :
 :
 
-CLOSET:id, description, name, created_at, uptated_at
+CLOSET:id, description, name, created_at, updated_at
 :
 :
 TAG:id, name, created_at, updated_at
