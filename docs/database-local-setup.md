@@ -78,8 +78,6 @@ docker exec -it crz_project_db sh
 
 #### Se connecter à PostgreSQL dans le conteneur
 
-Cette commande supprime aussi les données PostgreSQL stockées dans le volume Docker.
-
 📝 Adapter `user` et `crz_project`
 
 ```sh

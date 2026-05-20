@@ -13,7 +13,7 @@ services:
       POSTGRES_DB: ${POSTGRES_DB}
 
     ports:
-      # # Expose PostgreSQL on the host machine
+      # Expose PostgreSQL on the host machine
       - "${POSTGRES_PORT}:5432"
 
     volumes:
