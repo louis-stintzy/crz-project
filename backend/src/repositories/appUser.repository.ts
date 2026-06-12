@@ -1,5 +1,9 @@
 import { pool } from '../db/db_connect';
-import { AppUserDb, AppUserId } from '../types/appUser.types';
+import {
+  AppUserDb,
+  AppUserId,
+  CreateAppUserRepositoryData,
+} from '../types/appUser.types';
 
 const findAll = async (): Promise<AppUserDb[]> => {
   const query = `
@@ -20,8 +24,8 @@ const findAll = async (): Promise<AppUserDb[]> => {
 
 const findById = async (id: AppUserId): Promise<AppUserDb | null> => {
   const query = `
-  SELECT
-    id,
+    SELECT
+      id,
       pseudo,
       email,
       password_hash,
@@ -38,8 +42,8 @@ const findById = async (id: AppUserId): Promise<AppUserDb | null> => {
 
 const findByEmail = async (email: string): Promise<AppUserDb | null> => {
   const query = `
-  SELECT
-    id,
+    SELECT
+      id,
       pseudo,
       email,
       password_hash,
@@ -56,8 +60,8 @@ const findByEmail = async (email: string): Promise<AppUserDb | null> => {
 
 const findByPseudo = async (pseudo: string): Promise<AppUserDb | null> => {
   const query = `
-  SELECT
-    id,
+    SELECT
+      id,
       pseudo,
       email,
       password_hash,
@@ -72,9 +76,40 @@ const findByPseudo = async (pseudo: string): Promise<AppUserDb | null> => {
   return result.rows[0] ?? null;
 };
 
+const create = async (
+  data: CreateAppUserRepositoryData
+): Promise<AppUserDb> => {
+  const query = `
+    INSERT INTO app_user (
+      pseudo,
+      email,
+      password_hash,
+      picture_url
+    )
+    VALUES ($1, $2, $3, $4)
+    RETURNING
+      id,
+      pseudo,
+      email,
+      password_hash,
+      picture_url,
+      created_at,
+      updated_at;
+  `;
+  const values = [
+    data.pseudo,
+    data.email,
+    data.passwordHash,
+    data.pictureUrl ?? null,
+  ];
+  const result = await pool.query<AppUserDb>(query, values);
+  return result.rows[0]!;
+};
+
 export const appUserRepository = {
   findAll,
   findById,
   findByEmail,
   findByPseudo,
+  create,
 };

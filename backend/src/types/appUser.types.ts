@@ -12,6 +12,14 @@ export type AppUserId = AppUserIdParams['id'];
 export type CreateAppUserDTO = z.infer<typeof createAppUserSchema>;
 export type UpdateAppUserDTO = z.infer<typeof updateAppUserSchema>;
 
+// CreateAppUserRepositoryData
+export interface CreateAppUserRepositoryData {
+  pseudo: string;
+  email: string;
+  passwordHash: string;
+  pictureUrl?: string | null;
+}
+
 // AppUserDb represents the shape of the app user data stored in the database.
 export interface AppUserDb {
   id: AppUserId;

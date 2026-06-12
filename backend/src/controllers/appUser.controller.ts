@@ -30,14 +30,15 @@ const getById: RequestHandler<
   res.status(200).json(user);
 };
 
-const create: RequestHandler<unknown, string, CreateAppUserDTO, unknown> = (
-  req,
-  res
-) => {
+const create: RequestHandler<
+  unknown,
+  AppUserPublic,
+  CreateAppUserDTO,
+  unknown
+> = async (req, res) => {
   console.log('[POST] /api/v1/users');
-  const newUser: CreateAppUserDTO = req.body;
-  console.log('New user data:', newUser);
-  res.send('Create a new app user');
+  const createdUser = await appUserService.create(req.body);
+  res.status(201).json(createdUser);
 };
 
 const updateById: RequestHandler<

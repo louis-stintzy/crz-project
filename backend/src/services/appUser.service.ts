@@ -1,6 +1,11 @@
-import { NotFoundError } from '../errors/AppError';
+import { ConflictError, NotFoundError } from '../errors/AppError';
 import { appUserRepository } from '../repositories/appUser.repository';
-import { AppUserDb, AppUserId, AppUserPublic } from '../types/appUser.types';
+import {
+  AppUserDb,
+  AppUserId,
+  AppUserPublic,
+  CreateAppUserDTO,
+} from '../types/appUser.types';
 
 const mapAppUserDbToPublic = (user: AppUserDb): AppUserPublic => {
   return {
@@ -26,7 +31,33 @@ const getById = async (id: AppUserId): Promise<AppUserPublic> => {
   return mapAppUserDbToPublic(user);
 };
 
+const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
+  // Check if the user already exists
+  const existingUserByEmail = await appUserRepository.findByEmail(data.email);
+  if (existingUserByEmail)
+    throw new ConflictError(`Email already used: ${data.email}`);
+  const existingUserByPseudo = await appUserRepository.findByPseudo(
+    data.pseudo
+  );
+  if (existingUserByPseudo)
+    throw new ConflictError(`Pseudo already used: ${data.pseudo}`);
+
+  // TODO: Hash the password
+  const passwordHash = data.password;
+
+  // Create the user
+  const createdUser = await appUserRepository.create({
+    pseudo: data.pseudo,
+    email: data.email,
+    passwordHash,
+    pictureUrl: data.pictureUrl ?? null,
+  });
+
+  return mapAppUserDbToPublic(createdUser);
+};
+
 export const appUserService = {
   getAll,
   getById,
+  create,
 };
