@@ -56,8 +56,15 @@ const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
   return mapAppUserDbToPublic(createdUser);
 };
 
+const deleteById = async (id: AppUserId): Promise<void> => {
+  const hasDeletedUser = await appUserRepository.deleteById(id);
+  if (!hasDeletedUser) throw new NotFoundError('app_user', id);
+  return;
+};
+
 export const appUserService = {
   getAll,
   getById,
   create,
+  deleteById,
 };

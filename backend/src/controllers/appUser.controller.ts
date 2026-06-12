@@ -54,13 +54,16 @@ const updateById: RequestHandler<
   res.send(`Update app user with ID: ${id}`);
 };
 
-const deleteById: RequestHandler<AppUserIdParams, string, unknown, unknown> = (
-  req,
-  res
-) => {
+const deleteById: RequestHandler<
+  AppUserIdParams,
+  AppUserPublic,
+  unknown,
+  unknown
+> = async (req, res) => {
   const { id } = req.params;
   console.log(`[DELETE] /api/v1/users/${id}`);
-  res.send(`Delete app user with ID: ${id}`);
+  await appUserService.deleteById(id);
+  res.status(204).end();
 };
 
 export const appUserController = {

@@ -106,10 +106,20 @@ const create = async (
   return result.rows[0]!;
 };
 
+const deleteById = async (id: AppUserId): Promise<boolean> => {
+  const query = `
+    DELETE FROM app_user
+    WHERE id = $1
+  `;
+  const result = await pool.query<AppUserDb>(query, [id]);
+  return result.rowCount === 1;
+};
+
 export const appUserRepository = {
   findAll,
   findById,
   findByEmail,
   findByPseudo,
   create,
+  deleteById,
 };
