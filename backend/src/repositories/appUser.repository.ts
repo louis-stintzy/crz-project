@@ -3,6 +3,7 @@ import {
   AppUserDb,
   AppUserId,
   CreateAppUserRepositoryData,
+  UpdateAppUserRepositoryData,
 } from '../types/appUser.types';
 
 const findAll = async (): Promise<AppUserDb[]> => {
@@ -106,12 +107,62 @@ const create = async (
   return result.rows[0]!;
 };
 
+const updateById = async (
+  id: AppUserId,
+  data: UpdateAppUserRepositoryData
+): Promise<AppUserDb | null> => {
+  const fieldsToUpdate: string[] = [];
+  const values: unknown[] = [];
+  let paramIndex = 1;
+
+  if (data.pseudo !== undefined) {
+    fieldsToUpdate.push('pseudo = $' + paramIndex);
+    values.push(data.pseudo);
+    paramIndex++;
+  }
+  if (data.email !== undefined) {
+    fieldsToUpdate.push('email = $' + paramIndex);
+    values.push(data.email);
+    paramIndex++;
+  }
+  if (data.passwordHash !== undefined) {
+    fieldsToUpdate.push('password_hash = $' + paramIndex);
+    values.push(data.passwordHash);
+    paramIndex++;
+  }
+  if (data.pictureUrl !== undefined) {
+    fieldsToUpdate.push('picture_url = $' + paramIndex);
+    values.push(data.pictureUrl);
+    paramIndex++;
+  }
+  if (fieldsToUpdate.length === 0) return findById(id);
+  fieldsToUpdate.push('updated_at = NOW()');
+  values.push(id);
+
+  const query = `
+    UPDATE app_user
+    SET
+      ${fieldsToUpdate.join(', ')}
+    WHERE id = $${paramIndex}
+    RETURNING
+      id,
+      pseudo,
+      email,
+      password_hash,
+      picture_url,
+      created_at,
+      updated_at;
+  `;
+  const result = await pool.query<AppUserDb>(query, values);
+  return result.rows[0] ?? null;
+};
+
 const deleteById = async (id: AppUserId): Promise<boolean> => {
   const query = `
     DELETE FROM app_user
     WHERE id = $1
   `;
-  const result = await pool.query<AppUserDb>(query, [id]);
+  const result = await pool.query(query, [id]);
   return result.rowCount === 1;
 };
 
@@ -121,5 +172,6 @@ export const appUserRepository = {
   findByEmail,
   findByPseudo,
   create,
+  updateById,
   deleteById,
 };

@@ -5,6 +5,8 @@ import {
   AppUserId,
   AppUserPublic,
   CreateAppUserDTO,
+  UpdateAppUserDTO,
+  UpdateAppUserRepositoryData,
 } from '../types/appUser.types';
 
 const mapAppUserDbToPublic = (user: AppUserDb): AppUserPublic => {
@@ -56,6 +58,49 @@ const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
   return mapAppUserDbToPublic(createdUser);
 };
 
+const updateById = async (
+  id: AppUserId,
+  data: UpdateAppUserDTO
+): Promise<AppUserPublic> => {
+  // Check if the user exists
+  const existingUser = await appUserRepository.findById(id);
+  if (!existingUser) throw new NotFoundError('app_user', id);
+
+  // Check if the email is already used by another user
+  if (data.email && data.email !== existingUser.email) {
+    const existingUserByEmail = await appUserRepository.findByEmail(data.email);
+    if (existingUserByEmail && existingUserByEmail.id !== id)
+      throw new ConflictError(`Email already used: ${data.email}`);
+  }
+
+  // Check if the pseudo is already used by another user
+  if (data.pseudo && data.pseudo !== existingUser.pseudo) {
+    const existingUserByPseudo = await appUserRepository.findByPseudo(
+      data.pseudo
+    );
+    if (existingUserByPseudo && existingUserByPseudo.id !== id)
+      throw new ConflictError(`Pseudo already used: ${data.pseudo}`);
+  }
+
+  // TODO: Hash the password if it's being updated
+  let passwordHash: string | undefined;
+  if (data.password !== undefined) {
+    // Hash the password
+    passwordHash = data.password;
+  }
+
+  // Update the user
+  const updatePayload: UpdateAppUserRepositoryData = {};
+  if (data.pseudo !== undefined) updatePayload.pseudo = data.pseudo;
+  if (data.email !== undefined) updatePayload.email = data.email;
+  if (passwordHash !== undefined) updatePayload.passwordHash = passwordHash;
+  if (data.pictureUrl !== undefined) updatePayload.pictureUrl = data.pictureUrl;
+  const updatedUser = await appUserRepository.updateById(id, updatePayload);
+
+  if (!updatedUser) throw new NotFoundError('app_user', id);
+  return mapAppUserDbToPublic(updatedUser);
+};
+
 const deleteById = async (id: AppUserId): Promise<void> => {
   const hasDeletedUser = await appUserRepository.deleteById(id);
   if (!hasDeletedUser) throw new NotFoundError('app_user', id);
@@ -66,5 +111,6 @@ export const appUserService = {
   getAll,
   getById,
   create,
+  updateById,
   deleteById,
 };

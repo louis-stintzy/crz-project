@@ -20,6 +20,9 @@ export interface CreateAppUserRepositoryData {
   pictureUrl?: string | null;
 }
 
+// UpdateAppUserRepositoryData represents the shape of the data when updating an app user in the repository. It allows for partial updates, meaning that not all fields are required.
+export type UpdateAppUserRepositoryData = Partial<CreateAppUserRepositoryData>;
+
 // AppUserDb represents the shape of the app user data stored in the database.
 export interface AppUserDb {
   id: AppUserId;

@@ -43,20 +43,19 @@ const create: RequestHandler<
 
 const updateById: RequestHandler<
   AppUserIdParams,
-  string,
+  AppUserPublic,
   UpdateAppUserDTO,
   unknown
-> = (req, res) => {
+> = async (req, res) => {
   const { id } = req.params;
   console.log(`[PATCH] /api/v1/users/${id}`);
-  const updatedUser: UpdateAppUserDTO = req.body;
-  console.log('Updated user data:', updatedUser);
-  res.send(`Update app user with ID: ${id}`);
+  const updatedUser = await appUserService.updateById(id, req.body);
+  res.status(200).json(updatedUser);
 };
 
 const deleteById: RequestHandler<
   AppUserIdParams,
-  AppUserPublic,
+  void,
   unknown,
   unknown
 > = async (req, res) => {

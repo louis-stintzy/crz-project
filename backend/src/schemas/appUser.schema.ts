@@ -26,4 +26,9 @@ export const createAppUserSchema = z
   })
   .strict();
 
-export const updateAppUserSchema = createAppUserSchema.partial();
+export const updateAppUserSchema = createAppUserSchema
+  .partial()
+  .refine(
+    (data) => Object.keys(data).length > 0,
+    'At least one field must be provided for update'
+  );
