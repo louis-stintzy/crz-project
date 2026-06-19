@@ -2,7 +2,6 @@ import { RequestHandler } from 'express';
 import {
   AppUserIdParams,
   AppUserPublic,
-  CreateAppUserDTO,
   UpdateAppUserDTO,
 } from '../types/appUser.types';
 import { appUserService } from '../services/appUser.service';
@@ -28,17 +27,6 @@ const getById: RequestHandler<
   console.log(`[GET] /api/v1/users/${id}`);
   const user = await appUserService.getById(id);
   res.status(200).json(user);
-};
-
-const create: RequestHandler<
-  unknown,
-  AppUserPublic,
-  CreateAppUserDTO,
-  unknown
-> = async (req, res) => {
-  console.log('[POST] /api/v1/users');
-  const createdUser = await appUserService.create(req.body);
-  res.status(201).json(createdUser);
 };
 
 const updateById: RequestHandler<
@@ -68,7 +56,6 @@ const deleteById: RequestHandler<
 export const appUserController = {
   getAll,
   getById,
-  create,
   updateById,
   deleteById,
 };

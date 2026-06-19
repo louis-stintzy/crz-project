@@ -1,25 +1,13 @@
 import { ConflictError, NotFoundError } from '../errors/AppError';
+import { mapAppUserDbToPublic } from '../mappers/appUser.mapper';
 import { appUserRepository } from '../repositories/appUser.repository';
 import {
-  AppUserDb,
   AppUserId,
   AppUserPublic,
-  CreateAppUserDTO,
   UpdateAppUserDTO,
   UpdateAppUserRepositoryData,
 } from '../types/appUser.types';
 import { hashPassword } from '../utils/auth/hash';
-
-const mapAppUserDbToPublic = (user: AppUserDb): AppUserPublic => {
-  return {
-    id: user.id,
-    pseudo: user.pseudo,
-    email: user.email,
-    pictureUrl: user.picture_url,
-    createdAt: user.created_at,
-    updatedAt: user.updated_at,
-  };
-};
 
 const getAll = async (): Promise<AppUserPublic[]> => {
   const users = await appUserRepository.findAll();
@@ -32,35 +20,6 @@ const getById = async (id: AppUserId): Promise<AppUserPublic> => {
     throw new NotFoundError(`app_user`, id);
   }
   return mapAppUserDbToPublic(user);
-};
-
-// TODO(db-errors): catch PostgreSQL unique violation errors (23505)
-// around this insert to handle concurrent duplicate email/pseudo requests.
-// Current pre-checks are useful for friendly errors, but they are not enough
-// under concurrent requests because the database UNIQUE constraint may still fail.
-// Planned fix: convert 23505 errors into ConflictError instead of returning a generic 500
-
-const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
-  // Check if the user already exists
-  const existingUserByEmail = await appUserRepository.findByEmail(data.email);
-  if (existingUserByEmail)
-    throw new ConflictError(`Email already used: ${data.email}`);
-  const existingUserByPseudo = await appUserRepository.findByPseudo(
-    data.pseudo
-  );
-  if (existingUserByPseudo)
-    throw new ConflictError(`Pseudo already used: ${data.pseudo}`);
-
-  // Create the user
-  const passwordHash = await hashPassword(data.password);
-  const createdUser = await appUserRepository.create({
-    pseudo: data.pseudo,
-    email: data.email,
-    passwordHash,
-    pictureUrl: data.pictureUrl ?? null,
-  });
-
-  return mapAppUserDbToPublic(createdUser);
 };
 
 // TODO(db-errors): catch PostgreSQL unique violation errors (23505)
@@ -118,7 +77,6 @@ const deleteById = async (id: AppUserId): Promise<void> => {
 export const appUserService = {
   getAll,
   getById,
-  create,
   updateById,
   deleteById,
 };

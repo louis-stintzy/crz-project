@@ -1,15 +1,13 @@
 import { z } from 'zod';
 import {
   appUserIdParamSchema,
-  createAppUserSchema,
   updateAppUserSchema,
 } from '../schemas/appUser.schema';
 
 export type AppUserIdParams = z.infer<typeof appUserIdParamSchema>;
 export type AppUserId = AppUserIdParams['id'];
 
-// CreateAppUserDTO and UpdateAppUserDTO represent the expected shape of the data when creating or updating an app user, respectively.
-export type CreateAppUserDTO = z.infer<typeof createAppUserSchema>;
+// UpdateAppUserDTO represent the expected shape of the data when creating or updating an app user, respectively.
 export type UpdateAppUserDTO = z.infer<typeof updateAppUserSchema>;
 
 // CreateAppUserRepositoryData

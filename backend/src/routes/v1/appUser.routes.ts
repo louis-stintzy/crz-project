@@ -3,7 +3,6 @@ import { validateBody, validateParams } from '../../middlewares/validate';
 import { appUserController } from '../../controllers/appUser.controller';
 import {
   appUserIdParamSchema,
-  createAppUserSchema,
   updateAppUserSchema,
 } from '../../schemas/appUser.schema';
 
@@ -20,12 +19,6 @@ appUserRoutes.get(
   '/:id',
   validateParams(appUserIdParamSchema),
   appUserController.getById
-);
-
-appUserRoutes.post(
-  '/',
-  validateBody(createAppUserSchema),
-  appUserController.create
 );
 
 appUserRoutes.patch(
