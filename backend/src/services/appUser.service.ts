@@ -34,6 +34,12 @@ const getById = async (id: AppUserId): Promise<AppUserPublic> => {
   return mapAppUserDbToPublic(user);
 };
 
+// TODO(db-errors): catch PostgreSQL unique violation errors (23505)
+// around this insert to handle concurrent duplicate email/pseudo requests.
+// Current pre-checks are useful for friendly errors, but they are not enough
+// under concurrent requests because the database UNIQUE constraint may still fail.
+// Planned fix: convert 23505 errors into ConflictError instead of returning a generic 500
+
 const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
   // Check if the user already exists
   const existingUserByEmail = await appUserRepository.findByEmail(data.email);
@@ -56,6 +62,10 @@ const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
 
   return mapAppUserDbToPublic(createdUser);
 };
+
+// TODO(db-errors): catch PostgreSQL unique violation errors (23505)
+// around this update to handle concurrent email/pseudo conflicts consistently.
+// Planned fix: convert 23505 errors into ConflictError.
 
 const updateById = async (
   id: AppUserId,
