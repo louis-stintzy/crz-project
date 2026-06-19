@@ -8,6 +8,7 @@ import {
   UpdateAppUserDTO,
   UpdateAppUserRepositoryData,
 } from '../types/appUser.types';
+import { hashPassword } from '../utils/auth/hash';
 
 const mapAppUserDbToPublic = (user: AppUserDb): AppUserPublic => {
   return {
@@ -44,10 +45,8 @@ const create = async (data: CreateAppUserDTO): Promise<AppUserPublic> => {
   if (existingUserByPseudo)
     throw new ConflictError(`Pseudo already used: ${data.pseudo}`);
 
-  // TODO: Hash the password
-  const passwordHash = data.password;
-
   // Create the user
+  const passwordHash = await hashPassword(data.password);
   const createdUser = await appUserRepository.create({
     pseudo: data.pseudo,
     email: data.email,
@@ -82,11 +81,10 @@ const updateById = async (
       throw new ConflictError(`Pseudo already used: ${data.pseudo}`);
   }
 
-  // TODO: Hash the password if it's being updated
+  // Hash the password if it's provided
   let passwordHash: string | undefined;
   if (data.password !== undefined) {
-    // Hash the password
-    passwordHash = data.password;
+    passwordHash = await hashPassword(data.password);
   }
 
   // Update the user
