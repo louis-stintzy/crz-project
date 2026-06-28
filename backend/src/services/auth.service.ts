@@ -4,6 +4,7 @@ import { appUserRepository } from '../repositories/appUser.repository';
 import { AppUserPublic } from '../types/appUser.types';
 import { LoginInput, RegisterInput } from '../types/auth.types';
 import { comparePassword, hashPassword } from '../utils/auth/hash';
+import { generateAccessToken } from '../utils/auth/token';
 
 // TODO(db-errors): catch PostgreSQL unique violation errors (23505)
 // around this insert to handle concurrent duplicate email/pseudo requests.
@@ -34,7 +35,9 @@ const register = async (data: RegisterInput): Promise<AppUserPublic> => {
   return mapAppUserDbToPublic(createdUser);
 };
 
-const login = async (data: LoginInput): Promise<AppUserPublic> => {
+const login = async (
+  data: LoginInput
+): Promise<{ loggedInUser: AppUserPublic; accessToken: string }> => {
   // 1 - Find user by email
   const user = await appUserRepository.findByEmail(data.email);
   if (!user)
@@ -51,7 +54,16 @@ const login = async (data: LoginInput): Promise<AppUserPublic> => {
       `Invalid credentials (incorrect password) for route /login with email: ${data.email}` // internal message for debugging, not exposed to the client
     );
 
-  return mapAppUserDbToPublic(user);
+  // 3 - If the password is valid, generate an access token and return the user data
+  const loggedInUser = mapAppUserDbToPublic(user);
+  const accessToken = generateAccessToken({
+    userId: user.id,
+  });
+
+  return {
+    loggedInUser,
+    accessToken,
+  };
 };
 
 export const authService = {

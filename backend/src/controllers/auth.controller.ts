@@ -2,6 +2,10 @@ import { RequestHandler } from 'express';
 import { LoginInput, RegisterInput } from '../types/auth.types';
 import { AppUserPublic } from '../types/appUser.types';
 import { authService } from '../services/auth.service';
+import {
+  clearAccessTokenCookie,
+  setAccessTokenCookie,
+} from '../utils/auth/cookie';
 
 const register: RequestHandler<
   unknown,
@@ -20,12 +24,18 @@ const login: RequestHandler<
   LoginInput,
   unknown
 > = async (req, res) => {
-  const loggedInUser = await authService.login(req.body);
+  console.log('[POST] /api/v1/auth/login');
+  const { loggedInUser, accessToken } = await authService.login(req.body);
+  setAccessTokenCookie(res, accessToken);
   res.status(200).json(loggedInUser);
 };
 
-const logout: RequestHandler = async (req, res) => {
-  res.send('User logout endpoint');
+const logout: RequestHandler<unknown, unknown, unknown, unknown> = (
+  _req,
+  res
+) => {
+  clearAccessTokenCookie(res);
+  res.status(204).end();
 };
 
 export const authController = {

@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+export const accessTokenPayloadSchema = z.object({
+  userId: z.uuid('Invalid app user ID'),
+});
+
 export const registerSchema = z
   .object({
     pseudo: z
