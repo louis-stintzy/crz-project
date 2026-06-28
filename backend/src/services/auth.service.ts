@@ -1,10 +1,20 @@
-import { ConflictError, UnauthorizedError } from '../errors/AppError';
+import {
+  ConflictError,
+  NotFoundError,
+  UnauthorizedError,
+} from '../errors/AppError';
 import { mapAppUserDbToPublic } from '../mappers/appUser.mapper';
 import { appUserRepository } from '../repositories/appUser.repository';
 import { AppUserPublic } from '../types/appUser.types';
 import { LoginInput, RegisterInput } from '../types/auth.types';
 import { comparePassword, hashPassword } from '../utils/auth/hash';
 import { generateAccessToken } from '../utils/auth/token';
+
+const getMe = async (userId: string): Promise<AppUserPublic> => {
+  const user = await appUserRepository.findById(userId);
+  if (!user) throw new NotFoundError(`app_user`, userId);
+  return mapAppUserDbToPublic(user);
+};
 
 // TODO(db-errors): catch PostgreSQL unique violation errors (23505)
 // around this insert to handle concurrent duplicate email/pseudo requests.
@@ -67,6 +77,7 @@ const login = async (
 };
 
 export const authService = {
+  getMe,
   register,
   login,
 };

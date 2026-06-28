@@ -7,6 +7,15 @@ import {
   setAccessTokenCookie,
 } from '../utils/auth/cookie';
 
+const me: RequestHandler<unknown, AppUserPublic, unknown, unknown> = async (
+  req,
+  res
+) => {
+  console.log('[GET] /api/v1/auth/me');
+  const currentUser = await authService.getMe(req.user!.userId); // Assuming req.user is populated by the checkAuth middleware
+  res.status(200).json(currentUser);
+};
+
 const register: RequestHandler<
   unknown,
   AppUserPublic,
@@ -42,4 +51,5 @@ export const authController = {
   register,
   login,
   logout,
+  me,
 };
