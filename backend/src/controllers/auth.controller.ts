@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express';
-import { RegisterInput } from '../types/auth.types';
+import { LoginInput, RegisterInput } from '../types/auth.types';
 import { AppUserPublic } from '../types/appUser.types';
 import { authService } from '../services/auth.service';
 
@@ -14,8 +14,14 @@ const register: RequestHandler<
   res.status(201).json(createdUser);
 };
 
-const login: RequestHandler = async (req, res) => {
-  res.send('User login endpoint');
+const login: RequestHandler<
+  unknown,
+  AppUserPublic,
+  LoginInput,
+  unknown
+> = async (req, res) => {
+  const loggedInUser = await authService.login(req.body);
+  res.status(200).json(loggedInUser);
 };
 
 const logout: RequestHandler = async (req, res) => {

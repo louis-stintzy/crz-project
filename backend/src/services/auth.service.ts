@@ -1,9 +1,9 @@
-import { ConflictError } from '../errors/AppError';
+import { ConflictError, UnauthorizedError } from '../errors/AppError';
 import { mapAppUserDbToPublic } from '../mappers/appUser.mapper';
 import { appUserRepository } from '../repositories/appUser.repository';
 import { AppUserPublic } from '../types/appUser.types';
-import { RegisterInput } from '../types/auth.types';
-import { hashPassword } from '../utils/auth/hash';
+import { LoginInput, RegisterInput } from '../types/auth.types';
+import { comparePassword, hashPassword } from '../utils/auth/hash';
 
 // TODO(db-errors): catch PostgreSQL unique violation errors (23505)
 // around this insert to handle concurrent duplicate email/pseudo requests.
@@ -34,6 +34,27 @@ const register = async (data: RegisterInput): Promise<AppUserPublic> => {
   return mapAppUserDbToPublic(createdUser);
 };
 
+const login = async (data: LoginInput): Promise<AppUserPublic> => {
+  // 1 - Find user by email
+  const user = await appUserRepository.findByEmail(data.email);
+  if (!user)
+    throw new UnauthorizedError(
+      `Invalid credentials (email not found) for route /login with email: ${data.email}` // internal message for debugging, not exposed to the client
+    );
+  // 2 - Verify the password
+  const isPasswordValid = await comparePassword(
+    data.password,
+    user.password_hash
+  );
+  if (!isPasswordValid)
+    throw new UnauthorizedError(
+      `Invalid credentials (incorrect password) for route /login with email: ${data.email}` // internal message for debugging, not exposed to the client
+    );
+
+  return mapAppUserDbToPublic(user);
+};
+
 export const authService = {
   register,
+  login,
 };

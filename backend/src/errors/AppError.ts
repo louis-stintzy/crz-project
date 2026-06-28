@@ -17,6 +17,20 @@ export class AppError extends Error {
   }
 }
 
+export class ValidationError extends AppError {
+  constructor(details: string) {
+    super(400, 'Invalid data provided', details);
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
+export class UnauthorizedError extends AppError {
+  constructor(details: string) {
+    super(401, 'Unauthorized access', details);
+    Object.setPrototypeOf(this, new.target.prototype);
+  }
+}
+
 export class NotFoundError extends AppError {
   constructor(resource: string, id?: string) {
     super(
@@ -24,13 +38,6 @@ export class NotFoundError extends AppError {
       'The requested resource was not found',
       `Resource: ${resource}, ID: ${id}`
     );
-    Object.setPrototypeOf(this, new.target.prototype);
-  }
-}
-
-export class ValidationError extends AppError {
-  constructor(details: string) {
-    super(400, 'Invalid data provided', details);
     Object.setPrototypeOf(this, new.target.prototype);
   }
 }
