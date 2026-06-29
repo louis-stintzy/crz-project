@@ -14,6 +14,12 @@ const envSchema = z.object({
     .min(1, { message: 'Invalid PORT number' })
     .max(65535, { message: 'Invalid PORT number' }),
 
+  CORS_ORIGIN: z
+    .string()
+    .min(1, { message: 'CORS_ORIGIN is required' })
+    .transform((val) => val.split(',').map((url) => url.trim()))
+    .pipe(z.array(z.url({ message: 'Invalid URL in CORS_ORIGIN' }))),
+
   // Database configuration
   POSTGRES_USER: z.string().min(1, { message: 'POSTGRES_USER is required' }),
   POSTGRES_PASSWORD: z
