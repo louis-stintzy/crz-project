@@ -5,14 +5,23 @@ import {
   appUserIdParamSchema,
   updateAppUserSchema,
 } from '../../schemas/appUser.schema';
+import { checkAuth } from '../../middlewares/checkAuth';
 
+// Note: Apply authentication middleware to all routes in this router
 const appUserRoutes = Router();
+appUserRoutes.use(checkAuth());
 
-// TODO(auth): split public and protected user routes.
-// Public routes should eventually move to /auth, e.g. POST /auth/register and POST /auth/login.
-// Sensitive routes such as GET /users, PATCH /users/:id, and DELETE /users/:id
-// must require authentication and authorization before production deployment.
+// ----- Routes "self" -----
+appUserRoutes.get('/me', appUserController.getMe);
+appUserRoutes.patch(
+  '/me',
+  validateBody(updateAppUserSchema),
+  appUserController.updateMe
+);
+appUserRoutes.delete('/me', appUserController.deleteMe);
 
+// ----- Routes "admin" -----
+// TODO(auth): add authorization middleware to restrict access to admin users only.
 appUserRoutes.get('/', appUserController.getAll);
 
 appUserRoutes.get(

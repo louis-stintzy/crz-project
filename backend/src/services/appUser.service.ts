@@ -16,9 +16,7 @@ const getAll = async (): Promise<AppUserPublic[]> => {
 
 const getById = async (id: AppUserId): Promise<AppUserPublic> => {
   const user = await appUserRepository.findById(id);
-  if (!user) {
-    throw new NotFoundError(`app_user`, id);
-  }
+  if (!user) throw new NotFoundError(`app_user`, id);
   return mapAppUserDbToPublic(user);
 };
 
