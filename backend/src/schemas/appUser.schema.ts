@@ -4,7 +4,7 @@ export const appUserIdParamSchema = z.object({
   id: z.uuid('Invalid app user ID'),
 });
 
-export const createAppUserSchema = z
+export const appUserBaseSchema = z
   .object({
     pseudo: z
       .string()
@@ -26,7 +26,7 @@ export const createAppUserSchema = z
   })
   .strict();
 
-export const updateAppUserSchema = createAppUserSchema
+export const updateAppUserSchema = appUserBaseSchema
   .partial()
   .refine(
     (data) => Object.keys(data).length > 0,
