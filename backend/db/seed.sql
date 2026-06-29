@@ -1,10 +1,13 @@
 BEGIN;
 
 -- Insert sample users
+-- Login-capable seed users:
+-- john@example.com / Password123!
+-- jane@example.com / Password123!
 INSERT INTO app_user (pseudo, email, password_hash, picture_url)
 VALUES
-    ('john_doe', 'john@example.com', 'hashed_password_1', 'http://example.com/users/john.jpg'),
-    ('jane_doe', 'jane@example.com', 'hashed_password_2', 'http://example.com/users/jane.jpg')
+    ('john_doe', 'john@example.com', '$2b$10$eNYvsikEFmTxp/Fte7QaluByIdEel0uWX/L6zrHkJnpzYnDX9l2Cm', 'http://example.com/users/john.jpg'),
+    ('jane_doe', 'jane@example.com', '$2b$10$eNYvsikEFmTxp/Fte7QaluByIdEel0uWX/L6zrHkJnpzYnDX9l2Cm', 'http://example.com/users/jane.jpg')
 ON CONFLICT (email) DO NOTHING;
 
 -- Insert sample closets
