@@ -22,6 +22,7 @@ appUserRoutes.delete('/me', appUserController.deleteMe);
 
 // ----- Routes "admin" -----
 // TODO(auth): add authorization middleware to restrict access to admin users only.
+// ! WARNING: authenticated-only is not enough for these routes.
 appUserRoutes.get('/', appUserController.getAll);
 
 appUserRoutes.get(
