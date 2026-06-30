@@ -1,8 +1,6 @@
 import { useState } from "react";
 import type { Closet, ClothingItem } from "../types/closet.types";
 import Title from "./Title";
-
-import "./App.css";
 import InfoSection from "./InfoSection";
 import ClosetControls from "./ClosetControls";
 import Modal from "./Modal";

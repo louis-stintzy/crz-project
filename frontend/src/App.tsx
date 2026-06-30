@@ -1,7 +1,18 @@
+import { useState } from "react";
+import ClosetManager from "./components/ClosetManager";
+import LoginPage from "./components/LoginPage";
+import type { AppUserPublic } from "./types/appUser.types";
+
 function App() {
+  const [currentUser, setCurrentUser] = useState<AppUserPublic | null>(null);
+
   return (
     <div>
-      <h1>App</h1>
+      {currentUser ? (
+        <ClosetManager />
+      ) : (
+        <LoginPage onLogin={(user) => setCurrentUser(user)} />
+      )}
     </div>
   );
 }
