@@ -34,6 +34,7 @@ const logout: RequestHandler<unknown, unknown, unknown, unknown> = (
   _req,
   res
 ) => {
+  console.log('[POST] /api/v1/auth/logout');
   clearAccessTokenCookie(res);
   res.status(204).end();
 };

@@ -3,6 +3,7 @@ import ClosetManager from "./components/ClosetManager";
 import LoginPage from "./components/LoginPage";
 import type { AppUserPublic } from "./types/appUser.types";
 import { appUserService } from "./services/appUser.service";
+import LogoutButton from "./components/LogoutButton";
 
 function App() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -29,7 +30,10 @@ function App() {
   return (
     <div>
       {currentUser ? (
-        <ClosetManager />
+        <>
+          <ClosetManager />
+          <LogoutButton onLogout={() => setCurrentUser(null)} />
+        </>
       ) : (
         <LoginPage onLogin={(user) => setCurrentUser(user)} />
       )}

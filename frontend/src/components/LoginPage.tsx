@@ -8,6 +8,7 @@ interface LoginPageProps {
 }
 
 function LoginPage({ onLogin }: LoginPageProps) {
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -15,6 +16,7 @@ function LoginPage({ onLogin }: LoginPageProps) {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      setIsLoading(true);
       setMessage("Logging in...");
       const data: LoginInput = {
         email,
@@ -25,6 +27,7 @@ function LoginPage({ onLogin }: LoginPageProps) {
       setMessage(null);
     } catch (error) {
       console.error("Login failed:", error);
+      setIsLoading(false);
       setMessage("Invalid credentials or server error.");
     }
   };
@@ -55,7 +58,9 @@ function LoginPage({ onLogin }: LoginPageProps) {
             />
           </label>
         </div>
-        <button type="submit">Login</button>
+        <button type="submit" disabled={isLoading}>
+          Login
+        </button>
       </form>
       {message && <p>{message}</p>}
     </div>
