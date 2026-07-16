@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { authService } from "../services/auth.service";
+import { authService } from "../../services/auth.service";
 
 interface LogoutButtonProps {
   onLogout: () => void;

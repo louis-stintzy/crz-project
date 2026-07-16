@@ -1,3 +1,5 @@
+import type { RegisterInput } from "./auth.types";
+
 export interface AppUserPublic {
   id: string;
   pseudo: string;
@@ -6,3 +8,5 @@ export interface AppUserPublic {
   createdAt: string;
   updatedAt: string | null;
 }
+
+export type UpdateAppUserInput = Partial<RegisterInput>;

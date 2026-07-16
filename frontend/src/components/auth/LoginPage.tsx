@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { AppUserPublic } from "../types/appUser.types";
-import { authService } from "../services/auth.service";
-import type { LoginInput } from "../types/auth.types";
+import type { AppUserPublic } from "../../types/appUser.types";
+import { authService } from "../../services/auth.service";
+import type { LoginInput } from "../../types/auth.types";
 
 interface LoginPageProps {
   onLogin: (user: AppUserPublic) => void;

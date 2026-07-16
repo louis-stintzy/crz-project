@@ -1,7 +1,7 @@
 import { useState } from "react";
-import type { RegisterInput } from "../types/auth.types";
-import type { AppUserPublic } from "../types/appUser.types";
-import { authService } from "../services/auth.service";
+import type { RegisterInput } from "../../types/auth.types";
+import type { AppUserPublic } from "../../types/appUser.types";
+import { authService } from "../../services/auth.service";
 import { AxiosError } from "axios";
 
 function RegisterPage() {
