@@ -1,12 +1,15 @@
 import express from 'express';
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import v1Router from './routes/v1';
 import errorHandler from './middlewares/errorHandler';
 import { env } from './config/env';
+import { corsOptions } from './config/cors';
 
 const app = express();
 const { PORT } = env;
 
+app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

@@ -1,105 +1,47 @@
-import { useState } from "react";
-import type { Closet, ClothingItem } from "./types/closet.types";
-import Title from "./components/Title";
-
-import "./App.css";
-import InfoSection from "./components/InfoSection";
-import ClosetControls from "./components/ClosetControls";
-import Modal from "./components/Modal";
-import AddClothingItemForm from "./components/AddClothingItemForm";
+import { useEffect, useState } from "react";
+import ClosetManager from "./components/ClosetManager";
+import LoginPage from "./components/LoginPage";
+import type { AppUserPublic } from "./types/appUser.types";
+import { appUserService } from "./services/appUser.service";
+import LogoutButton from "./components/LogoutButton";
+import RegisterPage from "./components/RegisterPage";
 
 function App() {
-  // ----- STATE MANAGEMENT
-  const [infoMessage, setInfoMessage] = useState<string | null>(null);
-  const [closet, setCloset] = useState<Closet>({
-    isOpen: false,
-    clothes: [],
-  });
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [currentUser, setCurrentUser] = useState<AppUserPublic | null>(null);
 
-  // ----- FUNCTIONS TO MANAGE CLOSET STATE -----
-  const openCloset = () => {
-    setCloset((prevCloset) => ({ ...prevCloset, isOpen: true }));
-  };
-  const closeCloset = () => {
-    setCloset((prevCloset) => ({ ...prevCloset, isOpen: false }));
-  };
-  const addClothingItem = (item: ClothingItem) => {
-    setCloset((prevCloset) => ({
-      ...prevCloset,
-      clothes: [...prevCloset.clothes, item],
-    }));
-  };
-  const removeClothingItem = (id: number) => {
-    setCloset((prevCloset) => ({
-      ...prevCloset,
-      clothes: prevCloset.clothes.filter((item) => item.id !== id),
-    }));
-  };
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const user: AppUserPublic = await appUserService.getMe();
+        setCurrentUser(user);
+      } catch {
+        setCurrentUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchCurrentUser();
+  }, []);
 
-  // ----- EVENT HANDLERS -----
-  const handleOpenCloset = () => {
-    openCloset();
-    setInfoMessage("Closet is now open !");
-  };
-
-  const handleCloseCloset = () => {
-    closeCloset();
-    setInfoMessage("Closet is now closed !");
-  };
-
-  const handleAddItem = (newItem: ClothingItem) => {
-    addClothingItem(newItem);
-    setIsModalOpen(false);
-    setInfoMessage("Added a new clothing item !");
-  };
-
-  const handleRemoveItem = (id: number) => {
-    removeClothingItem(id);
-    setInfoMessage("Removed a clothing item !");
-  };
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
 
   return (
-    <>
-      <Title />
-      <InfoSection infoMessage={infoMessage} />
-      <ClosetControls
-        closetIsOpen={closet.isOpen}
-        onOpen={handleOpenCloset}
-        onClose={handleCloseCloset}
-        onAddItem={() => setIsModalOpen(true)}
-      />
-
-      {/* CLOTHING ITEMS LIST */}
-      {closet.isOpen && (
-        <div>
-          <h2>Clothing Items:</h2>
-          {closet.clothes.length === 0 ? (
-            <p>No clothing items in the closet.</p>
-          ) : (
-            <ul>
-              {closet.clothes.map((item) => (
-                <li key={item.id}>
-                  {item.name} - {item.type.category} ({item.style}, {item.color}
-                  )
-                  <button onClick={() => handleRemoveItem(item.id)}>
-                    Remove
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+    <div>
+      {currentUser ? (
+        <>
+          <ClosetManager />
+          <LogoutButton onLogout={() => setCurrentUser(null)} />
+        </>
+      ) : (
+        <>
+          <LoginPage onLogin={(user) => setCurrentUser(user)} />
+          <RegisterPage />
+        </>
       )}
-
-      <Modal
-        isOpen={isModalOpen}
-        title="Add Clothing Item"
-        onClose={() => setIsModalOpen(false)}
-      >
-        <AddClothingItemForm onAdd={handleAddItem} />
-      </Modal>
-    </>
+    </div>
   );
 }
 
