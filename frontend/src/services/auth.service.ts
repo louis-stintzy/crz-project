@@ -1,6 +1,14 @@
 import type { AppUserPublic } from "../types/appUser.types";
-import type { LoginInput } from "../types/auth.types";
+import type { LoginInput, RegisterInput } from "../types/auth.types";
 import { axiosInstance } from "./axiosInstance";
+
+const register = async (data: RegisterInput): Promise<AppUserPublic> => {
+  const response = await axiosInstance.post<AppUserPublic>(
+    "/auth/register",
+    data,
+  );
+  return response.data;
+};
 
 const login = async (data: LoginInput): Promise<AppUserPublic> => {
   const response = await axiosInstance.post<AppUserPublic>("/auth/login", data);
@@ -12,6 +20,7 @@ const logout = async (): Promise<void> => {
 };
 
 export const authService = {
+  register,
   login,
   logout,
 };

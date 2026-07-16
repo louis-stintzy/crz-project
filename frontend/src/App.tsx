@@ -4,6 +4,7 @@ import LoginPage from "./components/LoginPage";
 import type { AppUserPublic } from "./types/appUser.types";
 import { appUserService } from "./services/appUser.service";
 import LogoutButton from "./components/LogoutButton";
+import RegisterPage from "./components/RegisterPage";
 
 function App() {
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -35,7 +36,10 @@ function App() {
           <LogoutButton onLogout={() => setCurrentUser(null)} />
         </>
       ) : (
-        <LoginPage onLogin={(user) => setCurrentUser(user)} />
+        <>
+          <LoginPage onLogin={(user) => setCurrentUser(user)} />
+          <RegisterPage />
+        </>
       )}
     </div>
   );
