@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import type { RegisterInput } from "../../types/auth.types";
 import type { AppUserPublic } from "../../types/appUser.types";
 import { authService } from "../../services/auth.service";
@@ -13,7 +13,7 @@ function RegisterPage() {
   const [pictureUrl, setPictureUrl] = useState("");
   const [createdUser, setCreatedUser] = useState<AppUserPublic | null>(null);
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setIsLoading(true);

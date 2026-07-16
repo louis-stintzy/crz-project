@@ -1,7 +1,10 @@
-import { useEffect, useState } from "react";
-import type { AppUserPublic } from "../../types/appUser.types";
+import { useEffect, useState, type FormEvent } from "react";
+import type {
+  AppUserPublic,
+  UpdateAppUserInput,
+} from "../../types/appUser.types";
 import { appUserService } from "../../services/appUser.service";
-import { AxiosError } from "axios";
+import axios from "axios";
 
 interface ProfilePageProps {
   currentUser: AppUserPublic;
@@ -23,26 +26,26 @@ function ProfilePage({ currentUser, onUpdateProfile }: ProfilePageProps) {
     setPictureUrl(currentUser.pictureUrl || "");
   }, [currentUser]);
 
-  const handleUpdateProfile = async (e: React.FormEvent) => {
+  const handleUpdateProfile = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsLoading(true);
-    setMessage(null);
 
     try {
       setIsLoading(true);
       setMessage("Updating profile...");
-      const data = {
+      const data: UpdateAppUserInput = {
         pseudo,
         email,
-        password: password.trim() === "" ? undefined : password.trim(),
         pictureUrl: pictureUrl.trim() === "" ? null : pictureUrl.trim(),
       };
+      if (password.trim() !== "") data.password = password.trim();
       const updatedUser: AppUserPublic = await appUserService.updateMe(data);
       onUpdateProfile(updatedUser);
       setMessage("Profile updated successfully!");
     } catch (error) {
       console.error("Error updating profile:", error);
-      if (error instanceof AxiosError && error.response?.status === 409) {
+      if (axios.isAxiosError(error) && error.response?.status === 400) {
+        setMessage("The profile information is invalid.");
+      } else if (axios.isAxiosError(error) && error.response?.status === 409) {
         setMessage(
           `This account cannot be updated with this information. Please try using a different email address or username.`,
         );
@@ -88,6 +91,7 @@ function ProfilePage({ currentUser, onUpdateProfile }: ProfilePageProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               minLength={8}
+              placeholder="Leave empty to keep current password"
             />
           </label>
         </div>

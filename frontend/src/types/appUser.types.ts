@@ -1,5 +1,3 @@
-import type { RegisterInput } from "./auth.types";
-
 export interface AppUserPublic {
   id: string;
   pseudo: string;
@@ -9,4 +7,9 @@ export interface AppUserPublic {
   updatedAt: string | null;
 }
 
-export type UpdateAppUserInput = Partial<RegisterInput>;
+export interface UpdateAppUserInput {
+  pseudo?: string;
+  email?: string;
+  password?: string;
+  pictureUrl?: string | null;
+}
