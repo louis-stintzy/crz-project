@@ -36,6 +36,8 @@ function App() {
           <ProfilePage
             currentUser={currentUser}
             onUpdateProfile={(updatedUser) => setCurrentUser(updatedUser)}
+            onDeleteAccount={() => setCurrentUser(null)}
+            onLogout={() => setCurrentUser(null)}
           />
           <ClosetManager />
           <LogoutButton onLogout={() => setCurrentUser(null)} />

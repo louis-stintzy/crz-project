@@ -1,7 +1,9 @@
+import type { ReactNode } from "react";
+
 interface ModalProps {
   isOpen: boolean;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
   onClose: () => void;
 }
 
@@ -33,7 +35,9 @@ function Modal({ isOpen, title, children, onClose }: ModalProps) {
       >
         <h2>{title}</h2>
         {children}
-        <button onClick={onClose}>Close</button>
+        <button type="button" onClick={onClose}>
+          Close
+        </button>
       </div>
     </div>
   );

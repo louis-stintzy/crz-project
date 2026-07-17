@@ -11,7 +11,13 @@ const updateMe = async (data: UpdateAppUserInput): Promise<AppUserPublic> => {
   return response.data;
 };
 
+const deleteMe = async (): Promise<void> => {
+  await axiosInstance.delete<void>("/users/me");
+  return;
+};
+
 export const appUserService = {
   getMe,
   updateMe,
+  deleteMe,
 };

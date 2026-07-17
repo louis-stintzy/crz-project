@@ -5,13 +5,24 @@ import type {
 } from "../../types/appUser.types";
 import { appUserService } from "../../services/appUser.service";
 import axios from "axios";
+import DeleteAccountButton from "./DeleteAccountButton";
+import Modal from "../Modal";
+import DeleteAccountConfirmation from "./DeleteAccountConfirmation";
 
 interface ProfilePageProps {
   currentUser: AppUserPublic;
   onUpdateProfile: (updatedUser: AppUserPublic) => void;
+  onDeleteAccount: () => void;
+  onLogout: () => void;
 }
 
-function ProfilePage({ currentUser, onUpdateProfile }: ProfilePageProps) {
+function ProfilePage({
+  currentUser,
+  onUpdateProfile,
+  onDeleteAccount,
+  onLogout,
+}: ProfilePageProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [message, setMessage] = useState<string | null>(null);
   const [pseudo, setPseudo] = useState(currentUser.pseudo);
@@ -45,6 +56,8 @@ function ProfilePage({ currentUser, onUpdateProfile }: ProfilePageProps) {
       console.error("Error updating profile:", error);
       if (axios.isAxiosError(error) && error.response?.status === 400) {
         setMessage("The profile information is invalid.");
+      } else if (axios.isAxiosError(error) && error.response?.status === 401) {
+        onLogout();
       } else if (axios.isAxiosError(error) && error.response?.status === 409) {
         setMessage(
           `This account cannot be updated with this information. Please try using a different email address or username.`,
@@ -109,6 +122,20 @@ function ProfilePage({ currentUser, onUpdateProfile }: ProfilePageProps) {
           Update Profile
         </button>
       </form>
+      <DeleteAccountButton
+        isLoading={isLoading}
+        onOpenModal={() => setIsModalOpen(true)}
+      />
+      <Modal
+        isOpen={isModalOpen}
+        title="Delete account confirmation"
+        onClose={() => setIsModalOpen(false)}
+      >
+        <DeleteAccountConfirmation
+          onDeleteAccount={onDeleteAccount}
+          onLogout={onLogout}
+        />
+      </Modal>
       {message && <p>{message}</p>}
     </div>
   );
