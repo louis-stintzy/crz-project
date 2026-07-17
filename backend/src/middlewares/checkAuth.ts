@@ -9,10 +9,11 @@ export const checkAuth = () => {
     // 1 - Check if the access_token cookie is present
     const { access_token } = req.cookies;
     if (!access_token || typeof access_token !== 'string')
-      throw new UnauthorizedError('Access token is missing');
+      return next(new UnauthorizedError('Access token is missing'));
 
     // 2 - Verify the token to check if it matches the provided accessToken
     try {
+      // note: jsonwebtoken adds `iat` and `exp` to the decoded payload. The `accessTokenPayloadSchema` schema is not `.strict()`, so Zod accepts the payload even if it contains additional fields, and `result.data` will contain only: `{  userId: string; }`
       const payload = verifyAccessToken(access_token);
       const result = accessTokenPayloadSchema.safeParse(payload);
       if (!result.success) {
