@@ -21,7 +21,7 @@ function LogoutButton({ onLogout }: LogoutButtonProps) {
   };
   return (
     <button type="button" onClick={handleLogout} disabled={isLoading}>
-      Logout
+      {isLoading ? "Logging out..." : "Logout"}
     </button>
   );
 }

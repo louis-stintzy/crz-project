@@ -2,29 +2,30 @@ import { useState } from "react";
 import { appUserService } from "../../services/appUser.service";
 import axios from "axios";
 
-interface DeleteAccountConfirmation {
+interface DeleteAccountConfirmationProps {
   onDeleteAccount: () => void;
-  onLogout: () => void;
+  onUnauthorizedError: () => void;
+  onServerError: (message: string) => void;
 }
 
 function DeleteAccountConfirmation({
   onDeleteAccount,
-  onLogout,
-}: DeleteAccountConfirmation) {
+  onUnauthorizedError,
+  onServerError,
+}: DeleteAccountConfirmationProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string | null>(null);
   const handleDeleteAccount = async () => {
     try {
       setIsLoading(true);
-      setMessage("Deleting account...");
       await appUserService.deleteMe();
       onDeleteAccount();
     } catch (error) {
       console.error("Delete account failed:", error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        onLogout();
+        onUnauthorizedError();
+        return;
       }
-      setMessage("An error occurred while deleting the account.");
+      onServerError("An unexpected error occurred while deleting the account.");
     } finally {
       setIsLoading(false);
     }
@@ -36,9 +37,8 @@ function DeleteAccountConfirmation({
         undone.
       </p>
       <button type="button" onClick={handleDeleteAccount} disabled={isLoading}>
-        Delete my account
+        {isLoading ? "Deleting account..." : "Delete my account"}
       </button>
-      {message && <p>{message}</p>}
     </div>
   );
 }

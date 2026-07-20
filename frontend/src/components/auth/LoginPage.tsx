@@ -2,14 +2,22 @@ import { useState, type FormEvent } from "react";
 import type { AppUserPublic } from "../../types/appUser.types";
 import { authService } from "../../services/auth.service";
 import type { LoginInput } from "../../types/auth.types";
+import axios from "axios";
 
 interface LoginPageProps {
-  onLogin: (user: AppUserPublic) => void;
+  onShowRegisterPage: () => void;
+  onLoginSuccess: (user: AppUserPublic) => void;
+  onUnauthorizedError: () => void;
+  onServerError: (message: string) => void;
 }
 
-function LoginPage({ onLogin }: LoginPageProps) {
+function LoginPage({
+  onShowRegisterPage,
+  onLoginSuccess,
+  onUnauthorizedError,
+  onServerError,
+}: LoginPageProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -17,18 +25,21 @@ function LoginPage({ onLogin }: LoginPageProps) {
     e.preventDefault();
     try {
       setIsLoading(true);
-      setMessage("Logging in...");
       const data: LoginInput = {
         email,
         password,
       };
       const user: AppUserPublic = await authService.login(data);
-      onLogin(user);
-      setMessage(null);
+      onLoginSuccess(user);
     } catch (error) {
       console.error("Login failed:", error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        onUnauthorizedError();
+        return;
+      }
+      onServerError("An unexpected error occurred while logging in.");
+    } finally {
       setIsLoading(false);
-      setMessage("Invalid credentials or server error.");
     }
   };
 
@@ -59,10 +70,12 @@ function LoginPage({ onLogin }: LoginPageProps) {
           </label>
         </div>
         <button type="submit" disabled={isLoading}>
-          Login
+          {isLoading ? "Logging in..." : "Login"}
         </button>
       </form>
-      {message && <p>{message}</p>}
+      <button type="button" onClick={onShowRegisterPage} disabled={isLoading}>
+        Create an account
+      </button>
     </div>
   );
 }

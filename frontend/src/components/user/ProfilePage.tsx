@@ -11,30 +11,37 @@ import DeleteAccountConfirmation from "./DeleteAccountConfirmation";
 
 interface ProfilePageProps {
   currentUser: AppUserPublic;
+  onHideProfilePage: () => void;
   onUpdateProfile: (updatedUser: AppUserPublic) => void;
   onDeleteAccount: () => void;
-  onLogout: () => void;
+  onValidationError: () => void;
+  onUnauthorizedError: (action: "update" | "delete") => void;
+  onConflictError: () => void;
+  onServerError: (message: string) => void;
 }
 
 function ProfilePage({
   currentUser,
+  onHideProfilePage,
   onUpdateProfile,
   onDeleteAccount,
-  onLogout,
+  onValidationError,
+  onUnauthorizedError,
+  onConflictError,
+  onServerError,
 }: ProfilePageProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [pseudo, setPseudo] = useState(currentUser.pseudo);
   const [email, setEmail] = useState(currentUser.email);
   const [password, setPassword] = useState("");
-  const [pictureUrl, setPictureUrl] = useState(currentUser.pictureUrl || "");
+  const [pictureUrl, setPictureUrl] = useState(currentUser.pictureUrl ?? "");
 
   useEffect(() => {
     setPseudo(currentUser.pseudo);
     setEmail(currentUser.email);
     setPassword("");
-    setPictureUrl(currentUser.pictureUrl || "");
+    setPictureUrl(currentUser.pictureUrl ?? "");
   }, [currentUser]);
 
   const handleUpdateProfile = async (e: FormEvent<HTMLFormElement>) => {
@@ -42,7 +49,6 @@ function ProfilePage({
 
     try {
       setIsLoading(true);
-      setMessage("Updating profile...");
       const data: UpdateAppUserInput = {
         pseudo,
         email,
@@ -51,27 +57,29 @@ function ProfilePage({
       if (password.trim() !== "") data.password = password.trim();
       const updatedUser: AppUserPublic = await appUserService.updateMe(data);
       onUpdateProfile(updatedUser);
-      setMessage("Profile updated successfully!");
+      setPassword("");
     } catch (error) {
       console.error("Error updating profile:", error);
       if (axios.isAxiosError(error) && error.response?.status === 400) {
-        setMessage("The profile information is invalid.");
-      } else if (axios.isAxiosError(error) && error.response?.status === 401) {
-        onLogout();
-      } else if (axios.isAxiosError(error) && error.response?.status === 409) {
-        setMessage(
-          `This account cannot be updated with this information. Please try using a different email address or username.`,
-        );
-      } else {
-        setMessage("Failed to update profile.");
+        onValidationError();
+        return;
       }
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        onUnauthorizedError("update");
+        return;
+      }
+      if (axios.isAxiosError(error) && error.response?.status === 409) {
+        onConflictError();
+        return;
+      }
+      onServerError("An unexpected error occurred while updating the profile.");
     } finally {
       setIsLoading(false);
     }
   };
   return (
     <div>
-      <h1>ProfilePage</h1>
+      <h1>Profile Page</h1>
       <form onSubmit={handleUpdateProfile}>
         <div>
           <label>
@@ -119,13 +127,16 @@ function ProfilePage({
           </label>
         </div>
         <button type="submit" disabled={isLoading}>
-          Update Profile
+          {isLoading ? "Updating profile..." : "Update Profile"}
         </button>
       </form>
       <DeleteAccountButton
         isLoading={isLoading}
         onOpenModal={() => setIsModalOpen(true)}
       />
+      <button type="button" onClick={onHideProfilePage} disabled={isLoading}>
+        Back
+      </button>
       <Modal
         isOpen={isModalOpen}
         title="Delete account confirmation"
@@ -133,10 +144,10 @@ function ProfilePage({
       >
         <DeleteAccountConfirmation
           onDeleteAccount={onDeleteAccount}
-          onLogout={onLogout}
+          onUnauthorizedError={() => onUnauthorizedError("delete")}
+          onServerError={onServerError}
         />
       </Modal>
-      {message && <p>{message}</p>}
     </div>
   );
 }
