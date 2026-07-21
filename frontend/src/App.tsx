@@ -1,14 +1,13 @@
 import { useState } from "react";
 import ClosetManager from "./components/ClosetManager";
 import LoginPage from "./components/auth/LoginPage";
-import type { AppUserPublic } from "./types/appUser.types";
 import LogoutButton from "./components/auth/LogoutButton";
 import RegisterPage from "./components/auth/RegisterPage";
 import ProfilePage from "./components/user/ProfilePage";
 import { useAuth } from "./contexts/auth/useAuth";
 
 function App() {
-  const { currentUser, isLoadingAuth, setCurrentUser } = useAuth();
+  const { currentUser, isLoadingAuth } = useAuth();
 
   const [showProfilePage, setShowProfilePage] = useState<boolean>(false);
   const [showRegisterPage, setShowRegisterPage] = useState<boolean>(false);
@@ -26,33 +25,33 @@ function App() {
 
   const handleRegisterSuccess = () => {
     setShowRegisterPage(false);
-    setCurrentUser(null);
+    // setCurrentUser(null);
     setGlobalMessage("Account created successfully. You can now log in.");
   };
 
-  const handleLoginSuccess = (user: AppUserPublic) => {
+  const handleLoginSuccess = () => {
     setShowRegisterPage(false);
     setShowProfilePage(false);
-    setCurrentUser(user);
+    // setCurrentUser(user);
     setGlobalMessage(null);
   };
 
   const handleLogoutSuccess = () => {
     setShowRegisterPage(false);
     setShowProfilePage(false);
-    setCurrentUser(null);
+    // setCurrentUser(null);
     setGlobalMessage("You are logged out.");
   };
 
-  const handleUpdateProfileSuccess = (user: AppUserPublic) => {
-    setCurrentUser(user);
+  const handleUpdateProfileSuccess = () => {
+    // setCurrentUser(user);
     setGlobalMessage("Profile updated successfully!");
   };
 
   const handleDeleteAccountSuccess = () => {
     setShowRegisterPage(false);
     setShowProfilePage(false);
-    setCurrentUser(null);
+    // setCurrentUser(null);
     setGlobalMessage("Your account has been deleted successfully.");
   };
 
@@ -63,7 +62,7 @@ function App() {
   const handleUnauthorizedError = (action: "login" | "update" | "delete") => {
     setShowRegisterPage(false);
     setShowProfilePage(false);
-    setCurrentUser(null);
+    // setCurrentUser(null);
     if (action === "login") {
       setGlobalMessage("Invalid credentials. Please try again.");
       return;

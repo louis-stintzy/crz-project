@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { authService } from "../../services/auth.service";
+import { useAuth } from "../../contexts/auth/useAuth";
 
 interface LogoutButtonProps {
   onLogout: () => void;
 }
 
 function LogoutButton({ onLogout }: LogoutButtonProps) {
+  const { logout } = useAuth();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleLogout = async () => {
     try {
       setIsLoading(true);
-      await authService.logout();
+      await logout();
     } catch (error) {
       console.error(error);
     } finally {

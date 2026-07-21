@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import type { RegisterInput } from "../../types/auth.types";
-import { authService } from "../../services/auth.service";
 import axios from "axios";
+import { useAuth } from "../../contexts/auth/useAuth";
 
 interface RegisterPageProps {
   onHideRegisterPage: () => void;
@@ -18,6 +18,7 @@ function RegisterPage({
   onConflictError,
   onServerError,
 }: RegisterPageProps) {
+  const { register } = useAuth();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pseudo, setPseudo] = useState("");
   const [email, setEmail] = useState("");
@@ -34,7 +35,7 @@ function RegisterPage({
         password,
         pictureUrl: pictureUrl.trim() === "" ? null : pictureUrl.trim(),
       };
-      await authService.register(data);
+      await register(data);
       setPseudo("");
       setEmail("");
       setPassword("");

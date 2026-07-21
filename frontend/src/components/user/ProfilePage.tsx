@@ -3,16 +3,16 @@ import type {
   AppUserPublic,
   UpdateAppUserInput,
 } from "../../types/appUser.types";
-import { appUserService } from "../../services/appUser.service";
 import axios from "axios";
 import DeleteAccountButton from "./DeleteAccountButton";
 import Modal from "../Modal";
 import DeleteAccountConfirmation from "./DeleteAccountConfirmation";
+import { useAuth } from "../../contexts/auth/useAuth";
 
 interface ProfilePageProps {
   currentUser: AppUserPublic;
   onHideProfilePage: () => void;
-  onUpdateProfile: (updatedUser: AppUserPublic) => void;
+  onUpdateProfile: () => void;
   onDeleteAccount: () => void;
   onValidationError: () => void;
   onUnauthorizedError: (action: "update" | "delete") => void;
@@ -30,6 +30,8 @@ function ProfilePage({
   onConflictError,
   onServerError,
 }: ProfilePageProps) {
+  const { updateProfile, handleUnauthorized } = useAuth();
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pseudo, setPseudo] = useState(currentUser.pseudo);
@@ -55,8 +57,8 @@ function ProfilePage({
         pictureUrl: pictureUrl.trim() === "" ? null : pictureUrl.trim(),
       };
       if (password.trim() !== "") data.password = password.trim();
-      const updatedUser: AppUserPublic = await appUserService.updateMe(data);
-      onUpdateProfile(updatedUser);
+      await updateProfile(data);
+      onUpdateProfile();
       setPassword("");
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -65,6 +67,7 @@ function ProfilePage({
         return;
       }
       if (axios.isAxiosError(error) && error.response?.status === 401) {
+        handleUnauthorized("update");
         onUnauthorizedError("update");
         return;
       }

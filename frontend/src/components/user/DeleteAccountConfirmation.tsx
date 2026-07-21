@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { appUserService } from "../../services/appUser.service";
 import axios from "axios";
+import { useAuth } from "../../contexts/auth/useAuth";
 
 interface DeleteAccountConfirmationProps {
   onDeleteAccount: () => void;
@@ -13,15 +13,18 @@ function DeleteAccountConfirmation({
   onUnauthorizedError,
   onServerError,
 }: DeleteAccountConfirmationProps) {
+  const { deleteAccount, handleUnauthorized } = useAuth();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const handleDeleteAccount = async () => {
     try {
       setIsLoading(true);
-      await appUserService.deleteMe();
+      await deleteAccount();
       onDeleteAccount();
     } catch (error) {
       console.error("Delete account failed:", error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
+        handleUnauthorized("delete");
         onUnauthorizedError();
         return;
       }
