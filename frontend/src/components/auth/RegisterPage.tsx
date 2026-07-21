@@ -2,23 +2,26 @@ import { useState, type FormEvent } from "react";
 import type { RegisterInput } from "../../types/auth.types";
 import axios from "axios";
 import { useAuth } from "../../contexts/auth/useAuth";
+import { useNotification } from "../../contexts/notification/useNotification";
 
 interface RegisterPageProps {
   onHideRegisterPage: () => void;
   onRegisterSuccess: () => void;
-  onValidationError: () => void;
-  onConflictError: () => void;
-  onServerError: (message: string) => void;
+  // onValidationError: () => void;
+  // onConflictError: () => void;
+  // onServerError: (message: string) => void;
 }
 
 function RegisterPage({
   onHideRegisterPage,
   onRegisterSuccess,
-  onValidationError,
-  onConflictError,
-  onServerError,
+  // onValidationError,
+  // onConflictError,
+  // onServerError,
 }: RegisterPageProps) {
   const { register } = useAuth();
+  const { showMessage } = useNotification();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pseudo, setPseudo] = useState("");
   const [email, setEmail] = useState("");
@@ -40,18 +43,22 @@ function RegisterPage({
       setEmail("");
       setPassword("");
       setPictureUrl("");
+      showMessage("Account created successfully. You can now log in.");
       onRegisterSuccess();
     } catch (error) {
       console.error("Register failed:", error);
       if (axios.isAxiosError(error) && error.response?.status === 400) {
-        onValidationError();
+        showMessage("The account information is invalid.");
         return;
       }
       if (axios.isAxiosError(error) && error.response?.status === 409) {
-        onConflictError();
+        showMessage(
+          `This account cannot be created with this information. Please try using a different email address or username.`,
+        );
+        // onConflictError();
         return;
       }
-      onServerError("An unexpected error occurred while registering.");
+      showMessage("An unexpected error occurred while registering.");
     } finally {
       setIsLoading(false);
     }

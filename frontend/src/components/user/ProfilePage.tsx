@@ -8,29 +8,31 @@ import DeleteAccountButton from "./DeleteAccountButton";
 import Modal from "../Modal";
 import DeleteAccountConfirmation from "./DeleteAccountConfirmation";
 import { useAuth } from "../../contexts/auth/useAuth";
+import { useNotification } from "../../contexts/notification/useNotification";
 
 interface ProfilePageProps {
   currentUser: AppUserPublic;
   onHideProfilePage: () => void;
-  onUpdateProfile: () => void;
+  // onUpdateProfile: () => void;
   onDeleteAccount: () => void;
-  onValidationError: () => void;
+  // onValidationError: () => void;
   onUnauthorizedError: (action: "update" | "delete") => void;
-  onConflictError: () => void;
-  onServerError: (message: string) => void;
+  // onConflictError: () => void;
+  // onServerError: (message: string) => void;
 }
 
 function ProfilePage({
   currentUser,
   onHideProfilePage,
-  onUpdateProfile,
+  // onUpdateProfile,
   onDeleteAccount,
-  onValidationError,
+  // onValidationError,
   onUnauthorizedError,
-  onConflictError,
-  onServerError,
+  // onConflictError,
+  // onServerError,
 }: ProfilePageProps) {
   const { updateProfile, handleUnauthorized } = useAuth();
+  const { showMessage } = useNotification();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -58,24 +60,31 @@ function ProfilePage({
       };
       if (password.trim() !== "") data.password = password.trim();
       await updateProfile(data);
-      onUpdateProfile();
+      // onUpdateProfile();
+      showMessage("Profile updated successfully!");
       setPassword("");
     } catch (error) {
       console.error("Error updating profile:", error);
       if (axios.isAxiosError(error) && error.response?.status === 400) {
-        onValidationError();
+        showMessage("The profile information is invalid.");
         return;
       }
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         handleUnauthorized("update");
+        showMessage(
+          `Your session has expired. Your profile has not been updated. Please log in again.`,
+        );
         onUnauthorizedError("update");
         return;
       }
       if (axios.isAxiosError(error) && error.response?.status === 409) {
-        onConflictError();
+        showMessage(
+          `This account cannot be updated with this information. Please try using a different email address or username.`,
+        );
+        // onConflictError();
         return;
       }
-      onServerError("An unexpected error occurred while updating the profile.");
+      showMessage("An unexpected error occurred while updating the profile.");
     } finally {
       setIsLoading(false);
     }
@@ -148,7 +157,7 @@ function ProfilePage({
         <DeleteAccountConfirmation
           onDeleteAccount={onDeleteAccount}
           onUnauthorizedError={() => onUnauthorizedError("delete")}
-          onServerError={onServerError}
+          // onServerError={onServerError}
         />
       </Modal>
     </div>

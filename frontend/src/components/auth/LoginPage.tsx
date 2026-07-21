@@ -2,21 +2,23 @@ import { useState, type FormEvent } from "react";
 import type { LoginInput } from "../../types/auth.types";
 import axios from "axios";
 import { useAuth } from "../../contexts/auth/useAuth";
+import { useNotification } from "../../contexts/notification/useNotification";
 
 interface LoginPageProps {
   onShowRegisterPage: () => void;
   onLoginSuccess: () => void;
   onUnauthorizedError: () => void;
-  onServerError: (message: string) => void;
+  // onServerError: (message: string) => void;
 }
 
 function LoginPage({
   onShowRegisterPage,
   onLoginSuccess,
   onUnauthorizedError,
-  onServerError,
+  // onServerError,
 }: LoginPageProps) {
   const { login, handleUnauthorized } = useAuth();
+  const { showMessage, clearMessage } = useNotification();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [email, setEmail] = useState("");
@@ -33,15 +35,17 @@ function LoginPage({
       await login(data);
       setEmail("");
       setPassword("");
+      clearMessage();
       onLoginSuccess();
     } catch (error) {
       console.error("Login failed:", error);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         handleUnauthorized("login");
+        showMessage("Invalid credentials. Please try again.");
         onUnauthorizedError();
         return;
       }
-      onServerError("An unexpected error occurred while logging in.");
+      showMessage("An unexpected error occurred while logging in.");
     } finally {
       setIsLoading(false);
     }

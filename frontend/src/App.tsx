@@ -5,84 +5,92 @@ import LogoutButton from "./components/auth/LogoutButton";
 import RegisterPage from "./components/auth/RegisterPage";
 import ProfilePage from "./components/user/ProfilePage";
 import { useAuth } from "./contexts/auth/useAuth";
+import { useNotification } from "./contexts/notification/useNotification";
 
 function App() {
   const { currentUser, isLoadingAuth } = useAuth();
+  const { message, clearMessage } = useNotification();
 
   const [showProfilePage, setShowProfilePage] = useState<boolean>(false);
   const [showRegisterPage, setShowRegisterPage] = useState<boolean>(false);
-  const [globalMessage, setGlobalMessage] = useState<string | null>(null);
 
   const toggleProfilePageDisplay = () => {
     setShowProfilePage((prev) => !prev);
-    setGlobalMessage(null);
+    // setGlobalMessage(null);
+    clearMessage();
   };
 
   const toggleRegisterPageDisplay = () => {
     setShowRegisterPage((prev) => !prev);
-    setGlobalMessage(null);
+    // setGlobalMessage(null);
+    clearMessage();
   };
 
   const handleRegisterSuccess = () => {
     setShowRegisterPage(false);
     // setCurrentUser(null);
-    setGlobalMessage("Account created successfully. You can now log in.");
+    // setGlobalMessage("Account created successfully. You can now log in.");
   };
 
   const handleLoginSuccess = () => {
     setShowRegisterPage(false);
     setShowProfilePage(false);
     // setCurrentUser(user);
-    setGlobalMessage(null);
+    // setGlobalMessage(null);
   };
 
   const handleLogoutSuccess = () => {
     setShowRegisterPage(false);
     setShowProfilePage(false);
     // setCurrentUser(null);
-    setGlobalMessage("You are logged out.");
+    // setGlobalMessage("You are logged out.");
   };
 
-  const handleUpdateProfileSuccess = () => {
-    // setCurrentUser(user);
-    setGlobalMessage("Profile updated successfully!");
-  };
+  // const handleUpdateProfileSuccess = () => {
+  //    setCurrentUser(user);
+  //    setGlobalMessage("Profile updated successfully!");
+  // };
 
   const handleDeleteAccountSuccess = () => {
     setShowRegisterPage(false);
     setShowProfilePage(false);
     // setCurrentUser(null);
-    setGlobalMessage("Your account has been deleted successfully.");
+    // setGlobalMessage("Your account has been deleted successfully.");
   };
 
-  const handleValidationError = () => {
-    setGlobalMessage("The profile information is invalid.");
-  };
+  // const handleValidationError = () => {
+  //   setGlobalMessage("The profile information is invalid.");
+  //   showMessage("The profile information is invalid.");
+  // };
 
   const handleUnauthorizedError = (action: "login" | "update" | "delete") => {
     setShowRegisterPage(false);
     setShowProfilePage(false);
+    console.log(action);
     // setCurrentUser(null);
-    if (action === "login") {
-      setGlobalMessage("Invalid credentials. Please try again.");
-      return;
-    }
-    setGlobalMessage(
-      `Your session has expired. ${action === "update" ? "Your profile has not been updated." : "Your account was not deleted."} Please log in again.`,
-    );
+    // if (action === "login") {
+    //   setGlobalMessage("Invalid credentials. Please try again.");
+    //   return;
+    // }
+    // setGlobalMessage(
+    //   `Your session has expired. ${action === "update" ? "Your profile has not been updated." : "Your account was not deleted."} Please log in again.`,
+    // );
   };
 
   // TODO: Handle 404 on /users/me as an invalid session for getMe, updateMe and deleteMe.
 
-  const handleConflictError = (action: "register" | "update") => {
-    setGlobalMessage(
-      `This account cannot be ${action === "register" ? "created" : "updated"} with this information. Please try using a different email address or username.`,
-    );
-  };
+  // const handleConflictError = (action: "register" | "update") => {
+  //    setGlobalMessage(
+  //      `This account cannot be ${action === "register" ? "created" : "updated"} with this information. Please try using a different email address or username.`,
+  //    );
+  //   showMessage(
+  //     `This account cannot be ${action === "register" ? "created" : "updated"} with this information. Please try using a different email address or username.`,
+  //   );
+  // };
 
-  const handleServerError = (message: string) => {
-    setGlobalMessage(message);
-  };
+  // const handleServerError = (message: string) => {
+  //   setGlobalMessage(message);
+  // };
 
   if (isLoadingAuth) {
     return <p>Loading...</p>;
@@ -96,12 +104,12 @@ function App() {
             <ProfilePage
               currentUser={currentUser}
               onHideProfilePage={toggleProfilePageDisplay}
-              onUpdateProfile={handleUpdateProfileSuccess}
+              // onUpdateProfile={handleUpdateProfileSuccess}
               onDeleteAccount={handleDeleteAccountSuccess}
-              onValidationError={handleValidationError}
+              // onValidationError={handleValidationError}
               onUnauthorizedError={handleUnauthorizedError}
-              onConflictError={() => handleConflictError("update")}
-              onServerError={handleServerError}
+              // onConflictError={() => handleConflictError("update")}
+              // onServerError={handleServerError}
             />
           ) : (
             <>
@@ -120,20 +128,20 @@ function App() {
               onShowRegisterPage={toggleRegisterPageDisplay}
               onLoginSuccess={handleLoginSuccess}
               onUnauthorizedError={() => handleUnauthorizedError("login")}
-              onServerError={handleServerError}
+              // onServerError={handleServerError}
             />
           ) : (
             <RegisterPage
               onHideRegisterPage={toggleRegisterPageDisplay}
               onRegisterSuccess={handleRegisterSuccess}
-              onValidationError={handleValidationError}
-              onConflictError={() => handleConflictError("register")}
-              onServerError={handleServerError}
+              // onValidationError={handleValidationError}
+              // onConflictError={() => handleConflictError("register")}
+              // onServerError={handleServerError}
             />
           )}
         </>
       )}
-      {globalMessage && <p>{globalMessage}</p>}
+      {message && <p>{message}</p>}
     </div>
   );
 }
