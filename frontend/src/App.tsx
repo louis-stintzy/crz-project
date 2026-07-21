@@ -1,32 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ClosetManager from "./components/ClosetManager";
 import LoginPage from "./components/auth/LoginPage";
 import type { AppUserPublic } from "./types/appUser.types";
-import { appUserService } from "./services/appUser.service";
 import LogoutButton from "./components/auth/LogoutButton";
 import RegisterPage from "./components/auth/RegisterPage";
 import ProfilePage from "./components/user/ProfilePage";
+import { useAuth } from "./contexts/auth/useAuth";
 
 function App() {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [currentUser, setCurrentUser] = useState<AppUserPublic | null>(null);
+  const { currentUser, isLoadingAuth, setCurrentUser } = useAuth();
+
   const [showProfilePage, setShowProfilePage] = useState<boolean>(false);
   const [showRegisterPage, setShowRegisterPage] = useState<boolean>(false);
   const [globalMessage, setGlobalMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const user: AppUserPublic = await appUserService.getMe();
-        setCurrentUser(user);
-      } catch {
-        setCurrentUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCurrentUser();
-  }, []);
 
   const toggleProfilePageDisplay = () => {
     setShowProfilePage((prev) => !prev);
@@ -99,7 +85,7 @@ function App() {
     setGlobalMessage(message);
   };
 
-  if (isLoading) {
+  if (isLoadingAuth) {
     return <p>Loading...</p>;
   }
 
