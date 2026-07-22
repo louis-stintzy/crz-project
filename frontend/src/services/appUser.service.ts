@@ -1,4 +1,4 @@
-import type { AppUserPublic } from "../types/appUser.types";
+import type { AppUserPublic, UpdateAppUserInput } from "../types/appUser.types";
 import { axiosInstance } from "./axiosInstance";
 
 const getMe = async (): Promise<AppUserPublic> => {
@@ -6,6 +6,18 @@ const getMe = async (): Promise<AppUserPublic> => {
   return response.data;
 };
 
+const updateMe = async (data: UpdateAppUserInput): Promise<AppUserPublic> => {
+  const response = await axiosInstance.patch<AppUserPublic>("/users/me", data);
+  return response.data;
+};
+
+const deleteMe = async (): Promise<void> => {
+  await axiosInstance.delete<void>("/users/me");
+  return;
+};
+
 export const appUserService = {
   getMe,
+  updateMe,
+  deleteMe,
 };

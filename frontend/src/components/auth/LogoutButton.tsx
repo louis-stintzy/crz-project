@@ -1,19 +1,20 @@
 import { useState } from "react";
-import { authService } from "../services/auth.service";
+import { useAuth } from "../../contexts/auth/useAuth";
 
 interface LogoutButtonProps {
   onLogout: () => void;
 }
 
 function LogoutButton({ onLogout }: LogoutButtonProps) {
+  const { logout } = useAuth();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleLogout = async () => {
     try {
       setIsLoading(true);
-      await authService.logout();
-    } catch (error) {
-      console.error(error);
+      await logout();
+      //note: There's no need for catch blocks in LogoutButton, since the provider already handles everything.
     } finally {
       onLogout();
       setIsLoading(false);
@@ -21,7 +22,7 @@ function LogoutButton({ onLogout }: LogoutButtonProps) {
   };
   return (
     <button type="button" onClick={handleLogout} disabled={isLoading}>
-      Logout
+      {isLoading ? "Logging out..." : "Logout"}
     </button>
   );
 }

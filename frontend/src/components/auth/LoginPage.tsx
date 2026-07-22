@@ -1,34 +1,44 @@
-import { useState } from "react";
-import type { AppUserPublic } from "../types/appUser.types";
-import { authService } from "../services/auth.service";
-import type { LoginInput } from "../types/auth.types";
+import { useState, type FormEvent } from "react";
+import type { LoginInput } from "../../types/auth.types";
+import { useAuth } from "../../contexts/auth/useAuth";
+import { useNotification } from "../../contexts/notification/useNotification";
 
 interface LoginPageProps {
-  onLogin: (user: AppUserPublic) => void;
+  onShowRegisterPage: () => void;
+  onLoginSuccess: () => void;
+  onLoginFailure: () => void;
 }
 
-function LoginPage({ onLogin }: LoginPageProps) {
+function LoginPage({
+  onShowRegisterPage,
+  onLoginSuccess,
+  onLoginFailure,
+}: LoginPageProps) {
+  const { login } = useAuth();
+  const { clearMessage } = useNotification();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setIsLoading(true);
-      setMessage("Logging in...");
       const data: LoginInput = {
         email,
         password,
       };
-      const user: AppUserPublic = await authService.login(data);
-      onLogin(user);
-      setMessage(null);
-    } catch (error) {
-      console.error("Login failed:", error);
+      await login(data);
+      setEmail("");
+      setPassword("");
+      clearMessage();
+      onLoginSuccess();
+    } catch {
+      // note: Error message is handled by AuthProvider.
+      onLoginFailure();
+    } finally {
       setIsLoading(false);
-      setMessage("Invalid credentials or server error.");
     }
   };
 
@@ -59,10 +69,12 @@ function LoginPage({ onLogin }: LoginPageProps) {
           </label>
         </div>
         <button type="submit" disabled={isLoading}>
-          Login
+          {isLoading ? "Logging in..." : "Login"}
         </button>
       </form>
-      {message && <p>{message}</p>}
+      <button type="button" onClick={onShowRegisterPage} disabled={isLoading}>
+        Create an account
+      </button>
     </div>
   );
 }

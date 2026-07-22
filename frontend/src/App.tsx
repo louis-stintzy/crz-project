@@ -1,30 +1,35 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import ClosetManager from "./components/ClosetManager";
-import LoginPage from "./components/LoginPage";
-import type { AppUserPublic } from "./types/appUser.types";
-import { appUserService } from "./services/appUser.service";
-import LogoutButton from "./components/LogoutButton";
-import RegisterPage from "./components/RegisterPage";
+import LoginPage from "./components/auth/LoginPage";
+import LogoutButton from "./components/auth/LogoutButton";
+import RegisterPage from "./components/auth/RegisterPage";
+import ProfilePage from "./components/user/ProfilePage";
+import { useAuth } from "./contexts/auth/useAuth";
+import { useNotification } from "./contexts/notification/useNotification";
 
 function App() {
-  const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [currentUser, setCurrentUser] = useState<AppUserPublic | null>(null);
+  const { currentUser, isLoadingAuth } = useAuth();
+  const { message, clearMessage } = useNotification();
 
-  useEffect(() => {
-    const fetchCurrentUser = async () => {
-      try {
-        const user: AppUserPublic = await appUserService.getMe();
-        setCurrentUser(user);
-      } catch {
-        setCurrentUser(null);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchCurrentUser();
-  }, []);
+  const [showProfilePage, setShowProfilePage] = useState<boolean>(false);
+  const [showRegisterPage, setShowRegisterPage] = useState<boolean>(false);
 
-  if (isLoading) {
+  const toggleProfilePageDisplay = () => {
+    setShowProfilePage((prev) => !prev);
+    clearMessage();
+  };
+
+  const toggleRegisterPageDisplay = () => {
+    setShowRegisterPage((prev) => !prev);
+    clearMessage();
+  };
+
+  const resetAuthViews = () => {
+    setShowRegisterPage(false);
+    setShowProfilePage(false);
+  };
+
+  if (isLoadingAuth) {
     return <p>Loading...</p>;
   }
 
@@ -32,15 +37,39 @@ function App() {
     <div>
       {currentUser ? (
         <>
-          <ClosetManager />
-          <LogoutButton onLogout={() => setCurrentUser(null)} />
+          {showProfilePage ? (
+            <ProfilePage
+              currentUser={currentUser}
+              onHideProfilePage={toggleProfilePageDisplay}
+              onDeleteAccount={resetAuthViews}
+            />
+          ) : (
+            <>
+              <ClosetManager />
+              <button type="button" onClick={toggleProfilePageDisplay}>
+                Profile
+              </button>
+              <LogoutButton onLogout={resetAuthViews} />
+            </>
+          )}
         </>
       ) : (
         <>
-          <LoginPage onLogin={(user) => setCurrentUser(user)} />
-          <RegisterPage />
+          {!showRegisterPage ? (
+            <LoginPage
+              onShowRegisterPage={toggleRegisterPageDisplay}
+              onLoginSuccess={resetAuthViews}
+              onLoginFailure={resetAuthViews}
+            />
+          ) : (
+            <RegisterPage
+              onHideRegisterPage={toggleRegisterPageDisplay}
+              onRegisterSuccess={resetAuthViews}
+            />
+          )}
         </>
       )}
+      {message && <p>{message}</p>}
     </div>
   );
 }
