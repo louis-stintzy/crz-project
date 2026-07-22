@@ -3,28 +3,23 @@ import type {
   AppUserPublic,
   UpdateAppUserInput,
 } from "../../types/appUser.types";
-import axios from "axios";
 import DeleteAccountButton from "./DeleteAccountButton";
 import Modal from "../Modal";
 import DeleteAccountConfirmation from "./DeleteAccountConfirmation";
 import { useAuth } from "../../contexts/auth/useAuth";
-import { useNotification } from "../../contexts/notification/useNotification";
 
 interface ProfilePageProps {
   currentUser: AppUserPublic;
   onHideProfilePage: () => void;
   onDeleteAccount: () => void;
-  onUnauthorizedError: () => void;
 }
 
 function ProfilePage({
   currentUser,
   onHideProfilePage,
   onDeleteAccount,
-  onUnauthorizedError,
 }: ProfilePageProps) {
-  const { updateProfile, handleUnauthorized } = useAuth();
-  const { showMessage } = useNotification();
+  const { updateProfile } = useAuth();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -52,29 +47,9 @@ function ProfilePage({
       };
       if (password.trim() !== "") data.password = password.trim();
       await updateProfile(data);
-      showMessage("Profile updated successfully!");
       setPassword("");
-    } catch (error) {
-      console.error("Error updating profile:", error);
-      if (axios.isAxiosError(error) && error.response?.status === 400) {
-        showMessage("The profile information is invalid.");
-        return;
-      }
-      if (axios.isAxiosError(error) && error.response?.status === 401) {
-        handleUnauthorized("update");
-        showMessage(
-          `Your session has expired. Your profile has not been updated. Please log in again.`,
-        );
-        onUnauthorizedError();
-        return;
-      }
-      if (axios.isAxiosError(error) && error.response?.status === 409) {
-        showMessage(
-          `This account cannot be updated with this information. Please try using a different email address or username.`,
-        );
-        return;
-      }
-      showMessage("An unexpected error occurred while updating the profile.");
+    } catch {
+      // note: Error message is handled by AuthProvider.
     } finally {
       setIsLoading(false);
     }
@@ -144,10 +119,7 @@ function ProfilePage({
         title="Delete account confirmation"
         onClose={() => setIsModalOpen(false)}
       >
-        <DeleteAccountConfirmation
-          onDeleteAccount={onDeleteAccount}
-          onUnauthorizedError={onUnauthorizedError}
-        />
+        <DeleteAccountConfirmation onDeleteAccount={onDeleteAccount} />
       </Modal>
     </div>
   );

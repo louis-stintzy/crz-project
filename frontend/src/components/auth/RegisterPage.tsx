@@ -1,8 +1,6 @@
 import { useState, type FormEvent } from "react";
 import type { RegisterInput } from "../../types/auth.types";
-import axios from "axios";
 import { useAuth } from "../../contexts/auth/useAuth";
-import { useNotification } from "../../contexts/notification/useNotification";
 
 interface RegisterPageProps {
   onHideRegisterPage: () => void;
@@ -14,7 +12,6 @@ function RegisterPage({
   onRegisterSuccess,
 }: RegisterPageProps) {
   const { register } = useAuth();
-  const { showMessage } = useNotification();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [pseudo, setPseudo] = useState("");
@@ -37,21 +34,9 @@ function RegisterPage({
       setEmail("");
       setPassword("");
       setPictureUrl("");
-      showMessage("Account created successfully. You can now log in.");
       onRegisterSuccess();
-    } catch (error) {
-      console.error("Register failed:", error);
-      if (axios.isAxiosError(error) && error.response?.status === 400) {
-        showMessage("The account information is invalid.");
-        return;
-      }
-      if (axios.isAxiosError(error) && error.response?.status === 409) {
-        showMessage(
-          `This account cannot be created with this information. Please try using a different email address or username.`,
-        );
-        return;
-      }
-      showMessage("An unexpected error occurred while registering.");
+    } catch {
+      // note: Error message is handled by AuthProvider.
     } finally {
       setIsLoading(false);
     }

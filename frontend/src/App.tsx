@@ -29,8 +29,6 @@ function App() {
     setShowProfilePage(false);
   };
 
-  // TODO: Handle 404 on /users/me as an invalid session for getMe, updateMe and deleteMe.
-
   if (isLoadingAuth) {
     return <p>Loading...</p>;
   }
@@ -44,7 +42,6 @@ function App() {
               currentUser={currentUser}
               onHideProfilePage={toggleProfilePageDisplay}
               onDeleteAccount={resetAuthViews}
-              onUnauthorizedError={resetAuthViews}
             />
           ) : (
             <>
@@ -62,7 +59,7 @@ function App() {
             <LoginPage
               onShowRegisterPage={toggleRegisterPageDisplay}
               onLoginSuccess={resetAuthViews}
-              onUnauthorizedError={resetAuthViews}
+              onLoginFailure={resetAuthViews}
             />
           ) : (
             <RegisterPage

@@ -13,7 +13,6 @@ interface AuthContextValue {
   updateProfile: (data: UpdateAppUserInput) => Promise<void>;
   deleteAccount: () => Promise<void>;
   logout: () => Promise<void>;
-  handleUnauthorized: (action: "login" | "update" | "delete") => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
