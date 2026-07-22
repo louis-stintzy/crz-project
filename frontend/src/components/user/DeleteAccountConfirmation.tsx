@@ -6,13 +6,11 @@ import { useNotification } from "../../contexts/notification/useNotification";
 interface DeleteAccountConfirmationProps {
   onDeleteAccount: () => void;
   onUnauthorizedError: () => void;
-  // onServerError: (message: string) => void;
 }
 
 function DeleteAccountConfirmation({
   onDeleteAccount,
   onUnauthorizedError,
-  // onServerError,
 }: DeleteAccountConfirmationProps) {
   const { deleteAccount, handleUnauthorized } = useAuth();
   const { showMessage } = useNotification();

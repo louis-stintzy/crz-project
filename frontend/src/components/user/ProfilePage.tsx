@@ -13,23 +13,15 @@ import { useNotification } from "../../contexts/notification/useNotification";
 interface ProfilePageProps {
   currentUser: AppUserPublic;
   onHideProfilePage: () => void;
-  // onUpdateProfile: () => void;
   onDeleteAccount: () => void;
-  // onValidationError: () => void;
-  onUnauthorizedError: (action: "update" | "delete") => void;
-  // onConflictError: () => void;
-  // onServerError: (message: string) => void;
+  onUnauthorizedError: () => void;
 }
 
 function ProfilePage({
   currentUser,
   onHideProfilePage,
-  // onUpdateProfile,
   onDeleteAccount,
-  // onValidationError,
   onUnauthorizedError,
-  // onConflictError,
-  // onServerError,
 }: ProfilePageProps) {
   const { updateProfile, handleUnauthorized } = useAuth();
   const { showMessage } = useNotification();
@@ -60,7 +52,6 @@ function ProfilePage({
       };
       if (password.trim() !== "") data.password = password.trim();
       await updateProfile(data);
-      // onUpdateProfile();
       showMessage("Profile updated successfully!");
       setPassword("");
     } catch (error) {
@@ -74,14 +65,13 @@ function ProfilePage({
         showMessage(
           `Your session has expired. Your profile has not been updated. Please log in again.`,
         );
-        onUnauthorizedError("update");
+        onUnauthorizedError();
         return;
       }
       if (axios.isAxiosError(error) && error.response?.status === 409) {
         showMessage(
           `This account cannot be updated with this information. Please try using a different email address or username.`,
         );
-        // onConflictError();
         return;
       }
       showMessage("An unexpected error occurred while updating the profile.");
@@ -156,8 +146,7 @@ function ProfilePage({
       >
         <DeleteAccountConfirmation
           onDeleteAccount={onDeleteAccount}
-          onUnauthorizedError={() => onUnauthorizedError("delete")}
-          // onServerError={onServerError}
+          onUnauthorizedError={onUnauthorizedError}
         />
       </Modal>
     </div>

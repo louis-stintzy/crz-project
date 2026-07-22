@@ -8,14 +8,12 @@ interface LoginPageProps {
   onShowRegisterPage: () => void;
   onLoginSuccess: () => void;
   onUnauthorizedError: () => void;
-  // onServerError: (message: string) => void;
 }
 
 function LoginPage({
   onShowRegisterPage,
   onLoginSuccess,
   onUnauthorizedError,
-  // onServerError,
 }: LoginPageProps) {
   const { login, handleUnauthorized } = useAuth();
   const { showMessage, clearMessage } = useNotification();

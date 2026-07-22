@@ -7,17 +7,11 @@ import { useNotification } from "../../contexts/notification/useNotification";
 interface RegisterPageProps {
   onHideRegisterPage: () => void;
   onRegisterSuccess: () => void;
-  // onValidationError: () => void;
-  // onConflictError: () => void;
-  // onServerError: (message: string) => void;
 }
 
 function RegisterPage({
   onHideRegisterPage,
   onRegisterSuccess,
-  // onValidationError,
-  // onConflictError,
-  // onServerError,
 }: RegisterPageProps) {
   const { register } = useAuth();
   const { showMessage } = useNotification();
@@ -55,7 +49,6 @@ function RegisterPage({
         showMessage(
           `This account cannot be created with this information. Please try using a different email address or username.`,
         );
-        // onConflictError();
         return;
       }
       showMessage("An unexpected error occurred while registering.");
