@@ -90,7 +90,6 @@ const deleteById: RequestHandler<
   const { id } = req.params;
   console.log(`[DELETE] /api/v1/users/${id}`);
   await appUserService.deleteById(id);
-  clearAccessTokenCookie(res);
   res.status(204).end();
 };
 
