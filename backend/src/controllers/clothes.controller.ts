@@ -4,7 +4,7 @@ import {
   ClothingItem,
   CreateClothingItemDTO,
   UpdateClothingItemDTO,
-} from '../types/closet.types';
+} from '../types/clothes.types';
 import { clothesService } from '../services/clothes.service';
 
 const getAll: RequestHandler<

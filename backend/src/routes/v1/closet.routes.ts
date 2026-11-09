@@ -1,36 +1,41 @@
 import { Router } from 'express';
+import { closetController } from '../../controllers/closet.controller';
 import { checkAuth } from '../../middlewares/checkAuth';
-// Note: Apply authentication middleware to all routes in this router
+import { validateBody, validateParams } from '../../middlewares/validate';
+import {
+  closetIdParamSchema,
+  createClosetSchema,
+  updateClosetSchema,
+} from '../../schemas/closet.schema';
 
 const closetRoutes = Router();
 closetRoutes.use(checkAuth());
 
-closetRoutes.get('/', (_req, res) => {
-  console.log('[GET] /api/v1/closets');
-  res.send('Get all closets');
-});
+closetRoutes.get('/', closetController.getAll);
 
-closetRoutes.get('/:id', (req, res) => {
-  const { id } = req.params;
-  console.log(`[GET] /api/v1/closets/${id}`);
-  res.send(`Get closet by ID: ${id}`);
-});
+closetRoutes.get(
+  '/:id',
+  validateParams(closetIdParamSchema),
+  closetController.getById
+);
 
-closetRoutes.post('/', (_req, res) => {
-  console.log('[POST] /api/v1/closets');
-  res.send('Create a new clothing item');
-});
+closetRoutes.post(
+  '/',
+  validateBody(createClosetSchema),
+  closetController.create
+);
 
-closetRoutes.patch('/:id', (req, res) => {
-  const { id } = req.params;
-  console.log(`[PUT] /api/v1/closets/${id}`);
-  res.send(`Update closet with ID: ${id}`);
-});
+closetRoutes.patch(
+  '/:id',
+  validateParams(closetIdParamSchema),
+  validateBody(updateClosetSchema),
+  closetController.updateById
+);
 
-closetRoutes.delete('/:id', (req, res) => {
-  const { id } = req.params;
-  console.log(`[DELETE] /api/v1/closets/${id}`);
-  res.send(`Delete closet with ID: ${id}`);
-});
+closetRoutes.delete(
+  '/:id',
+  validateParams(closetIdParamSchema),
+  closetController.deleteById
+);
 
 export default closetRoutes;
