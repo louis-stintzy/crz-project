@@ -47,11 +47,7 @@ const updateById: RequestHandler<
 > = async (req, res) => {
   const { id } = req.params;
   console.log(`[PATCH] /api/v1/closets/${id}`);
-  const closet = await closetService.updateById(
-    id,
-    req.user!.userId,
-    req.body
-  );
+  const closet = await closetService.updateById(id, req.user!.userId, req.body);
   res.status(200).json(closet);
 };
 

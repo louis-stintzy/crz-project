@@ -20,10 +20,7 @@ const getAll = async (userId: string): Promise<Closet[]> => {
   return closets.map(mapClosetDbToPublic);
 };
 
-const getById = async (
-  id: ClosetId,
-  userId: string
-): Promise<Closet> => {
+const getById = async (id: ClosetId, userId: string): Promise<Closet> => {
   const closet = await closetRepository.findById(id, userId);
   if (!closet) throw new NotFoundError('closet', id);
   return mapClosetDbToPublic(closet);
@@ -59,10 +56,7 @@ const updateById = async (
   }
 };
 
-const deleteById = async (
-  id: ClosetId,
-  userId: string
-): Promise<void> => {
+const deleteById = async (id: ClosetId, userId: string): Promise<void> => {
   const deleted = await closetRepository.deleteById(id, userId);
   if (!deleted) throw new NotFoundError('closet', id);
 };

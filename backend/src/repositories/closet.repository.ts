@@ -82,10 +82,7 @@ const updateById = async (
   return result.rows[0] ?? null;
 };
 
-const deleteById = async (
-  id: ClosetId,
-  userId: string
-): Promise<boolean> => {
+const deleteById = async (id: ClosetId, userId: string): Promise<boolean> => {
   const query = `
     DELETE FROM closet
     WHERE id = $1 AND user_id = $2;

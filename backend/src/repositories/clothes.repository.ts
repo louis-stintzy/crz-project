@@ -63,7 +63,7 @@ const updateById = async (
 ): Promise<ClothingItem | null> => {
   const index = await clothes.findIndex((clothing) => clothing.id === id);
   if (index === -1) return null;
-  const currentItem = clothes[index] as ClothingItem;
+  const currentItem = clothes[index]!;
   const updatedItem: ClothingItem = { ...currentItem, ...data };
   clothes[index] = updatedItem;
   return updatedItem;
