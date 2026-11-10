@@ -2,6 +2,7 @@ import { Router } from 'express';
 import clothesRoutes from './clothes.routes';
 import appUserRoutes from './appUser.routes';
 import authRoutes from './auth.routes';
+import closetRoutes from './closet.routes';
 
 const v1Router = Router();
 
@@ -16,6 +17,7 @@ v1Router.get('/', (_req, res) => {
 // Planned fix: add JWT authentication middleware and ownership/admin checks.
 v1Router.use('/auth', authRoutes);
 v1Router.use('/users', appUserRoutes);
+v1Router.use('/closets', closetRoutes);
 v1Router.use('/clothes', clothesRoutes);
 
 export default v1Router;
