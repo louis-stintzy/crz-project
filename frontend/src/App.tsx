@@ -6,6 +6,7 @@ import RegisterPage from "./components/auth/RegisterPage";
 import ProfilePage from "./components/user/ProfilePage";
 import { useAuth } from "./contexts/auth/useAuth";
 import { useNotification } from "./contexts/notification/useNotification";
+import AppLayout from "./components/layout/AppLayout";
 
 function App() {
   const { currentUser, isLoadingAuth } = useAuth();
@@ -34,7 +35,7 @@ function App() {
   }
 
   return (
-    <div>
+    <AppLayout>
       {currentUser ? (
         <>
           {showProfilePage ? (
@@ -70,7 +71,7 @@ function App() {
         </>
       )}
       {message && <p>{message}</p>}
-    </div>
+    </AppLayout>
   );
 }
 
