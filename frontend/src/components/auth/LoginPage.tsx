@@ -68,7 +68,7 @@ function LoginPage({
           {isLoading ? <CircularProgress size={24} color="inherit" /> : "Sign in"}
         </Button>
       </Stack>
-      <Typography variant="body2" textAlign="center">
+      <Typography variant="body2" sx={{ textAlign: "center" }}>
         Don't have an account?{" "}
         <Button variant="text" onClick={onShowRegisterPage} disabled={isLoading}>
           Create an account

@@ -22,8 +22,8 @@ function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
       }}
     >
       <Stack
-        justifyContent="space-between"
         sx={{
+          justifyContent: "space-between",
           display: { xs: "none", md: "flex" },
           position: "relative",
           overflow: "hidden",
@@ -32,12 +32,12 @@ function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
           background: "linear-gradient(145deg, #304D3C, #66846D)",
         }}
       >
-        <Typography variant="h6" fontWeight={700}>
+        <Typography variant="h6" sx={{ fontWeight: 700 }}>
           Closet Manager
         </Typography>
 
         <Box sx={{ position: "relative", zIndex: 1 }}>
-          <Typography variant="h3" fontWeight={700} gutterBottom>
+          <Typography variant="h3" gutterBottom sx={{ fontWeight: 700 }}>
             Your wardrobe,
             <br />
             your way.
@@ -66,11 +66,10 @@ function AuthLayout({ children, title, subtitle }: AuthLayoutProps) {
 
       <Stack
         spacing={3}
-        justifyContent="center"
-        sx={{ p: { xs: 3, sm: 5, md: 6 } }}
+        sx={{ justifyContent: "center", p: { xs: 3, sm: 5, md: 6 } }}
       >
         <Box>
-          <Typography component="h1" variant="h4" fontWeight={700} gutterBottom>
+          <Typography component="h1" variant="h4" gutterBottom sx={{ fontWeight: 700 }}>
             {title}
           </Typography>
           <Typography color="text.secondary">{subtitle}</Typography>

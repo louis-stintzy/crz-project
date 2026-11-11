@@ -90,7 +90,7 @@ function RegisterPage({
           {isLoading ? <CircularProgress size={24} color="inherit" /> : "Create account"}
         </Button>
       </Stack>
-      <Typography variant="body2" textAlign="center">
+      <Typography variant="body2" sx={{ textAlign: "center" }}>
         Already have an account?{" "}
         <Button variant="text" onClick={onHideRegisterPage} disabled={isLoading}>
           Sign in
