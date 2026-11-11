@@ -1,6 +1,6 @@
 # Closet Manager — Roadmap
 
-> Document vivant du projet. Dernière mise à jour : 2026-11-10.
+> Document vivant du projet. Dernière mise à jour : 2026-11-11.
 >
 > **Source de vérité :** les lots déclarés « terminés » correspondent aux fonctionnalités présentes dans les PR fusionnées dans `dev`. Une fusion ne prouve pas, à elle seule, la validation complète en conditions réelles. Les vérifications et limites connues sont signalées séparément.
 >
@@ -29,7 +29,7 @@ Objectifs progressifs :
 
 ## Architecture actuelle
 
-- **Frontend :** React, TypeScript, Vite, Axios, `AuthProvider` et contexte de notifications. Formulaires principalement HTML natif à ce stade ; MUI non installé.
+- **Frontend :** React, TypeScript, Vite, Axios, `AuthProvider` et contexte de notifications. Material UI, Emotion, Roboto, thème global et AppLayout installés ; formulaires Auth/Profile encore en HTML natif.
 - **Backend :** Node.js, Express 5, TypeScript, Zod, PostgreSQL (`pg`), architecture routes → controllers → services → repositories, mappers SQL/API et gestion centralisée des erreurs via `AppError`.
 - **Authentification :** register/login/logout, bcrypt, JWT en cookie HTTP-only, `checkAuth()`, routes `/users/me`. La restauration de session frontend repose sur `GET /users/me`.
 - **Données :** `app_user`, `closet`, `clothing_item`, `clothing_category`, `tag`, `outfit`, photos et tables d'association. MCD : [MCD](./MCD.svg) et [source Mocodo](./mocodo.md). Initialisation et jeu de données : `backend/db/init.sql` et `backend/db/seed.sql`.
@@ -55,10 +55,10 @@ Objectifs progressifs :
 | 3 — Authentification JWT backend | ✅ Fusionné | Inscription, connexion, déconnexion, cookie JWT, `checkAuth` | PR [#8](https://github.com/louis-stintzy/crz-project/pull/8) |
 | 4 — Authentification frontend et profil | ✅ Fusionné | AuthProvider, Login/Register, `/users/me`, édition/suppression profil | PR [#10](https://github.com/louis-stintzy/crz-project/pull/10), [#13](https://github.com/louis-stintzy/crz-project/pull/13) |
 | 5 — CRUD Closet backend | ✅ Fusionné | Routes, Zod, SQL PostgreSQL, contrôles de propriété, mapper, documentation | PR [#14](https://github.com/louis-stintzy/crz-project/pull/14) |
-| 6A — MUI : fondations | ⏭ Prochain | Installer MUI/Emotion, définir un thème minimal et un layout responsive | `feat/mui-foundation` (proposition) |
-| 6B — MUI : authentification | Prévu | Refaire LoginPage et RegisterPage avec composants MUI ; conserver services et flux actuels | Branche à définir |
+| 6A — MUI : fondations | ✅ Fusionné | MUI/Emotion, police Roboto, ThemeProvider, CssBaseline et AppLayout | PR [#15](https://github.com/louis-stintzy/crz-project/pull/15) |
+| 6B — MUI : compte utilisateur | ⏭ Prochain | LoginPage, RegisterPage, ProfilePage et confirmation de suppression en MUI ; préserver les flux API | `feat/mui-user-forms` (proposition) |
 | 6C — MUI : gestion des placards | Prévu | Liste des placards, création, édition, suppression avec confirmation ; connexion au CRUD PostgreSQL | Branche à définir |
-| 6D — MUI : harmonisation UI | Prévu | Navigation, états chargement/erreur/vide, notifications, responsive, cohérence visuelle ; décider du traitement de ProfilePage | Branche à définir |
+| 6D — MUI : harmonisation UI | Prévu | Navigation, notifications globales, états chargement/erreur/vide, responsive et cohérence visuelle | Branche à définir |
 | 7 — CRUD Clothing Item backend | Reporté | Remplacer le prototype en mémoire par le modèle SQL réel avec ownership hérité du placard | Branche à définir |
 | 8 — Clothing Item frontend | Prévu | Lister, ajouter, modifier, supprimer les vêtements d'un placard | Branche à définir |
 | 9 — Tags, catégories, recherche | Prévu | Gestion et filtrage des vêtements/tenues | À préciser |
@@ -69,18 +69,19 @@ Les sous-lots 6A à 6D forment un **chantier UI unique**, mais restent séparabl
 
 ## Prochaine action concrète
 
-**Lot 6A — Fondations Material UI**, à partir de `dev`, sur une branche courte `feat/mui-foundation`.
+**Lot 6B — Formulaires du compte utilisateur avec Material UI**, à partir de `dev`, sur `feat/mui-user-forms` (nom proposé).
 
-1. Vérifier l'état de `dev` et le bon fonctionnement du frontend existant.
-2. Installer les dépendances MUI nécessaires (`@mui/material`, `@emotion/react`, `@emotion/styled` ; icônes uniquement si utiles).
-3. Définir un `ThemeProvider`, un `CssBaseline` et un thème sobre, ajustable avec l'élève.
-4. Introduire un layout minimal réutilisable sans transformer prématurément toute l'application.
-5. Vérifier `npm run build` et `npm run lint` dans `frontend` ; inspecter l'interface en navigateur.
-6. Créer une PR vers `dev`, faire la review, puis mettre à jour cette roadmap.
+Le lot 6A est fusionné via la PR #15. Ne pas modifier l'authentification backend ni les services API pour un changement d'apparence.
 
-**Lot 6B, dans la foulée :** utiliser `Container`, `Paper`, `Stack`, `Typography`, `TextField`, `Button`, `Alert` et un indicateur de chargement pour LoginPage/RegisterPage. Préserver les appels `useAuth().login/register`, les validations et les messages, vérifier la saisie, les erreurs HTTP et les transitions entre pages. La logique auth déjà vérifiée antérieurement ne nécessite pas d'audit E2E exhaustif avant les travaux UI, mais un test de non-régression après migration reste souhaitable.
+1. **6B.1 — LoginPage :** remplacer le formulaire HTML par `Paper`, `Stack`, `Typography`, `TextField` et `Button` ; préserver `useAuth().login()`, les erreurs et les transitions.
+2. **6B.2 — RegisterPage :** mêmes composants et disposition ; conserver `useAuth().register()`, les champs, contraintes de saisie, états chargement et gestion des erreurs `400/409`.
+3. **6B.3 — ProfilePage :** reprendre le même style pour le formulaire de profil ; préserver la mise à jour des données et le comportement lors d'une session expirée.
+4. **6B.4 — Suppression et vérification :** utiliser un `Dialog` MUI pour confirmer la suppression du compte, avec libellés explicites et état de chargement. Vérifier le clavier, les erreurs affichées, l'accessibilité et le responsive.
+5. Vérifier `npm run lint`, `npm run build` et les parcours login/register/profile/logout/delete dans le navigateur, puis faire une PR vers `dev`. Mettre à jour cette roadmap après fusion.
 
-**Lot 6C :** ajouter un `closet.service.ts` côté frontend, les types correspondants et une vue de placards. Prévoir création, renommage, description facultative, confirmation de suppression, erreurs `401/404/409` et chargement. Faire les tests E2E du CRUD Closet **à ce moment**, depuis les formulaires jusqu'à PostgreSQL. Tester aussi les endpoints isolément avec deux comptes, notamment le refus d'accès à un placard tiers.
+**Principes :** conserver les fichiers `components/auth/LoginPage.tsx`, `RegisterPage.tsx` et `components/user/ProfilePage.tsx`. Extraire un composant commun uniquement si un véritable besoin de réutilisation apparaît. Ne pas imposer un nouveau routeur, une bibliothèque de formulaires ou un état global supplémentaire dans ce lot.
+
+**Lot 6C ensuite :** ajouter un service frontend `closet`, ses types et des formulaires MUI pour lister/créer/modifier/supprimer les placards. Les tests E2E Closet sont réservés à ce lot, avec vérification des droits entre deux comptes.
 
 ## Vérifications et dette technique
 
@@ -91,7 +92,8 @@ Les sous-lots 6A à 6D forment un **chantier UI unique**, mais restent séparabl
 - **Conflits PostgreSQL :** traiter de manière homogène les violations `23505` pour email/pseudo, y compris en accès concurrent.
 - **Session / sécurité :** revoir les options de cookie, CORS, CSRF et la politique de renouvellement des tokens avant déploiement. Ne pas interpréter le fonctionnement local comme une garantie de sécurité en production.
 - **Suppression en cascade :** supprimer un placard supprime ses vêtements associés selon le schéma SQL ; ajouter une confirmation UI explicite.
-- **Frontend :** évaluer ultérieurement si `ProfilePage` doit être harmonisée avec MUI dans le lot 6D et si une navigation par routes devient préférable aux booléens de vues dans `App.tsx`.
+- **Frontend :** `ProfilePage` est incluse dans le lot 6B. Une navigation par routes pourra être envisagée plus tard à la place des booléens de vues dans `App.tsx`.
+- **Vite :** exclure `.vite/` du suivi Git (cache local de préoptimisation des dépendances).
 - **Tests :** pas encore de suite automatisée significative pour ce backend ; prévoir progressivement tests de services/API et vérifications de non-régression.
 
 ## Points à préciser plus tard
