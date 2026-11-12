@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Alert } from "@mui/material";
 import ClosetManager from "./components/ClosetManager";
 import LoginPage from "./components/auth/LoginPage";
 import LogoutButton from "./components/auth/LogoutButton";
@@ -10,19 +11,17 @@ import AppLayout from "./components/layout/AppLayout";
 
 function App() {
   const { currentUser, isLoadingAuth } = useAuth();
-  const { message, clearMessage } = useNotification();
+  const { notification, clearMessage } = useNotification();
 
   const [showProfilePage, setShowProfilePage] = useState<boolean>(false);
   const [showRegisterPage, setShowRegisterPage] = useState<boolean>(false);
 
   const toggleProfilePageDisplay = () => {
     setShowProfilePage((prev) => !prev);
-    clearMessage();
   };
 
   const toggleRegisterPageDisplay = () => {
     setShowRegisterPage((prev) => !prev);
-    clearMessage();
   };
 
   const resetAuthViews = () => {
@@ -36,6 +35,15 @@ function App() {
 
   return (
     <AppLayout>
+      {notification && (
+        <Alert
+          severity={notification.severity}
+          onClose={clearMessage}
+          sx={{ mb: 3 }}
+        >
+          {notification.message}
+        </Alert>
+      )}
       {currentUser ? (
         <>
           {showProfilePage ? (
@@ -70,7 +78,6 @@ function App() {
           )}
         </>
       )}
-      {message && <p>{message}</p>}
     </AppLayout>
   );
 }

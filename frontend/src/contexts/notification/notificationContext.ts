@@ -1,8 +1,12 @@
 import { createContext } from "react";
+import type {
+  Notification,
+  NotificationSeverity,
+} from "../../types/notification.types";
 
 interface NotificationContextValue {
-  message: string | null;
-  showMessage: (message: string) => void;
+  notification: Notification | null;
+  showMessage: (message: string, severity: NotificationSeverity) => void;
   clearMessage: () => void;
 }
 
