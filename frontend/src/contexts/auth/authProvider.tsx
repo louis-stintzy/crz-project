@@ -35,20 +35,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.register(data);
       setCurrentUser(null);
-      showMessage("Account created successfully. You can now log in.");
+      showMessage(
+        "Account created successfully. You can now log in.",
+        "success",
+      );
     } catch (error) {
       console.error("Register failed:", error);
       if (axios.isAxiosError(error) && error.response?.status === 400) {
-        showMessage("The account information is invalid.");
+        showMessage("The account information is invalid.", "error");
         throw error;
       }
       if (axios.isAxiosError(error) && error.response?.status === 409) {
         showMessage(
           `This account cannot be created with this information. Please try using a different email address or username.`,
+          "error",
         );
         throw error;
       }
-      showMessage("An unexpected error occurred while registering.");
+      showMessage("An unexpected error occurred while registering.", "error");
       throw error;
     }
   };
@@ -63,10 +67,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error("Login failed:", error);
       setCurrentUser(null);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        showMessage("Invalid credentials. Please try again.");
+        showMessage("Invalid credentials. Please try again.", "error");
         throw error;
       }
-      showMessage("An unexpected error occurred while logging in.");
+      showMessage("An unexpected error occurred while logging in.", "error");
       throw error;
     }
   };
@@ -76,11 +80,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       const updatedUser: AppUserPublic = await appUserService.updateMe(data);
       setCurrentUser(updatedUser);
-      showMessage("Profile updated successfully!");
+      showMessage("Profile updated successfully!", "success");
     } catch (error) {
       console.error("Error updating profile:", error);
       if (axios.isAxiosError(error) && error.response?.status === 400) {
-        showMessage("The profile information is invalid.");
+        showMessage("The profile information is invalid.", "error");
         throw error;
       }
       if (
@@ -90,16 +94,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setCurrentUser(null);
         showMessage(
           `Your session has expired. Your profile has not been updated. Please log in again.`,
+          "error",
         );
         throw error;
       }
       if (axios.isAxiosError(error) && error.response?.status === 409) {
         showMessage(
           `This account cannot be updated with this information. Please try using a different email address or username.`,
+          "error",
         );
         throw error;
       }
-      showMessage("An unexpected error occurred while updating the profile.");
+      showMessage(
+        "An unexpected error occurred while updating the profile.",
+        "error",
+      );
       throw error;
     }
   };
@@ -108,7 +117,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await appUserService.deleteMe();
       setCurrentUser(null);
-      showMessage("Your account has been deleted successfully.");
+      showMessage("Your account has been deleted successfully.", "success");
     } catch (error) {
       console.error("Delete account failed:", error);
       if (
@@ -118,10 +127,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setCurrentUser(null);
         showMessage(
           `Your session has expired. Your account was not deleted. Please log in again.`,
+          "error",
         );
         throw error;
       }
-      showMessage("An unexpected error occurred while deleting the account.");
+      showMessage(
+        "An unexpected error occurred while deleting the account.",
+        "error",
+      );
       throw error;
     }
   };
@@ -130,11 +143,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     try {
       await authService.logout();
-      showMessage("You are logged out.");
+      showMessage("You are logged out.", "info");
     } catch (error) {
       console.error(error);
       showMessage(
         "You are not properly logged out. Please log in again and then log out.",
+        "error",
       );
     } finally {
       // note: Regardless of whether the logout request succeeds or fails, we clear the current user state to ensure the user is logged out on the client side.

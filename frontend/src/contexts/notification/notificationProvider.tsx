@@ -1,21 +1,25 @@
 import { useState, type ReactNode } from "react";
+import type {
+  Notification,
+  NotificationSeverity,
+} from "../../types/notification.types";
 import { NotificationContext } from "./notificationContext";
 
 export function NotificationProvider({ children }: { children: ReactNode }) {
-  const [message, setMessage] = useState<string | null>(null);
+  const [notification, setNotification] = useState<Notification | null>(null);
 
-  const showMessage = (message: string) => {
-    setMessage(message);
+  const showMessage = (message: string, severity: NotificationSeverity) => {
+    setNotification({ message, severity });
   };
 
   const clearMessage = () => {
-    setMessage(null);
+    setNotification(null);
   };
 
   return (
     <NotificationContext
       value={{
-        message,
+        notification,
         showMessage,
         clearMessage,
       }}

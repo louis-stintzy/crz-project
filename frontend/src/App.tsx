@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Alert, Box } from "@mui/material";
 import ClosetManager from "./components/ClosetManager";
 import LoginPage from "./components/auth/LoginPage";
 import LogoutButton from "./components/auth/LogoutButton";
@@ -10,7 +11,7 @@ import AppLayout from "./components/layout/AppLayout";
 
 function App() {
   const { currentUser, isLoadingAuth } = useAuth();
-  const { message, clearMessage } = useNotification();
+  const { notification, clearMessage } = useNotification();
 
   const [showProfilePage, setShowProfilePage] = useState<boolean>(false);
   const [showRegisterPage, setShowRegisterPage] = useState<boolean>(false);
@@ -36,6 +37,18 @@ function App() {
 
   return (
     <AppLayout>
+      <Box
+        sx={{
+          minHeight: { xs: 112, sm: 88 },
+          mb: 2,
+        }}
+      >
+        {notification && (
+          <Alert severity={notification.severity} onClose={clearMessage}>
+            {notification.message}
+          </Alert>
+        )}
+      </Box>
       {currentUser ? (
         <>
           {showProfilePage ? (
@@ -70,7 +83,6 @@ function App() {
           )}
         </>
       )}
-      {message && <p>{message}</p>}
     </AppLayout>
   );
 }
