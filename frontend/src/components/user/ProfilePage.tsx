@@ -66,7 +66,9 @@ function ProfilePage({
   };
 
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", py: { xs: 1, sm: 4 } }}>
+    <Box
+      sx={{ display: "flex", justifyContent: "center", py: { xs: 1, sm: 4 } }}
+    >
       <Paper
         elevation={0}
         sx={{
@@ -87,7 +89,12 @@ function ProfilePage({
             <Avatar
               src={currentUser.pictureUrl ?? undefined}
               alt={`${currentUser.pseudo}'s profile picture`}
-              sx={{ width: 72, height: 72, bgcolor: "primary.main", fontSize: 30 }}
+              sx={{
+                width: 72,
+                height: 72,
+                bgcolor: "primary.main",
+                fontSize: 30,
+              }}
             >
               {currentUser.pseudo.charAt(0).toUpperCase()}
             </Avatar>
@@ -141,18 +148,32 @@ function ProfilePage({
               onChange={(e) => setPictureUrl(e.target.value)}
               disabled={isLoading}
             />
-            <Button
-              type="submit"
-              variant="contained"
-              size="large"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <CircularProgress size={24} color="inherit" />
-              ) : (
-                "Update profile"
-              )}
-            </Button>
+
+            <Stack direction={{ xs: "column-reverse", sm: "row" }} spacing={2}>
+              <Button
+                type="button"
+                variant="outlined"
+                onClick={onHideProfilePage}
+                disabled={isLoading}
+                sx={{ flex: 1 }}
+              >
+                Back
+              </Button>
+
+              <Button
+                type="submit"
+                variant="contained"
+                size="large"
+                disabled={isLoading}
+                sx={{ flex: 2 }}
+              >
+                {isLoading ? (
+                  <CircularProgress size={24} color="inherit" />
+                ) : (
+                  "Update profile"
+                )}
+              </Button>
+            </Stack>
           </Stack>
 
           <Divider />
@@ -166,25 +187,13 @@ function ProfilePage({
                 Permanently remove your account and its data.
               </Typography>
             </Box>
-            <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={1.5}
-              sx={{ justifyContent: "space-between" }}
-            >
-              <Button
-                type="button"
-                variant="text"
-                onClick={onHideProfilePage}
-                disabled={isLoading}
-                sx={{ alignSelf: { xs: "stretch", sm: "center" } }}
-              >
-                Back
-              </Button>
+
+            <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
               <DeleteAccountButton
                 isLoading={isLoading}
                 onOpenModal={() => setIsModalOpen(true)}
               />
-            </Stack>
+            </Box>
           </Stack>
         </Stack>
       </Paper>
