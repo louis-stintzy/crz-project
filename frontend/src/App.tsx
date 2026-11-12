@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert, Box } from "@mui/material";
-import ClosetManager from "./components/ClosetManager";
+import ClosetList from "./components/closet/ClosetList";
 import LoginPage from "./components/auth/LoginPage";
 import LogoutButton from "./components/auth/LogoutButton";
 import RegisterPage from "./components/auth/RegisterPage";
@@ -59,7 +59,7 @@ function App() {
             />
           ) : (
             <>
-              <ClosetManager />
+              <ClosetList />
               <button type="button" onClick={toggleProfilePageDisplay}>
                 Profile
               </button>
