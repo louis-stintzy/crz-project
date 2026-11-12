@@ -1,6 +1,6 @@
 # Closet Manager — Roadmap
 
-> Document vivant du projet. Dernière mise à jour : 2026-11-11.
+> Document vivant du projet. Dernière mise à jour : 2026-11-12.
 >
 > **Source de vérité :** les lots déclarés « terminés » correspondent aux fonctionnalités présentes dans les PR fusionnées dans `dev`. Une fusion ne prouve pas, à elle seule, la validation complète en conditions réelles. Les vérifications et limites connues sont signalées séparément.
 >
@@ -29,7 +29,7 @@ Objectifs progressifs :
 
 ## Architecture actuelle
 
-- **Frontend :** React, TypeScript, Vite, Axios, `AuthProvider` et contexte de notifications. Material UI, Emotion, Roboto, thème global et AppLayout installés ; formulaires Auth/Profile encore en HTML natif.
+- **Frontend :** React, TypeScript, Vite, Axios, `AuthProvider` et contexte de notifications. Material UI, Emotion, Roboto, thème global et AppLayout installés ; Login/Register/Profile et confirmation de suppression migrés vers MUI ; notifications typées via Alert.
 - **Backend :** Node.js, Express 5, TypeScript, Zod, PostgreSQL (`pg`), architecture routes → controllers → services → repositories, mappers SQL/API et gestion centralisée des erreurs via `AppError`.
 - **Authentification :** register/login/logout, bcrypt, JWT en cookie HTTP-only, `checkAuth()`, routes `/users/me`. La restauration de session frontend repose sur `GET /users/me`.
 - **Données :** `app_user`, `closet`, `clothing_item`, `clothing_category`, `tag`, `outfit`, photos et tables d'association. MCD : [MCD](./MCD.svg) et [source Mocodo](./mocodo.md). Initialisation et jeu de données : `backend/db/init.sql` et `backend/db/seed.sql`.
@@ -56,32 +56,35 @@ Objectifs progressifs :
 | 4 — Authentification frontend et profil | ✅ Fusionné | AuthProvider, Login/Register, `/users/me`, édition/suppression profil | PR [#10](https://github.com/louis-stintzy/crz-project/pull/10), [#13](https://github.com/louis-stintzy/crz-project/pull/13) |
 | 5 — CRUD Closet backend | ✅ Fusionné | Routes, Zod, SQL PostgreSQL, contrôles de propriété, mapper, documentation | PR [#14](https://github.com/louis-stintzy/crz-project/pull/14) |
 | 6A — MUI : fondations | ✅ Fusionné | MUI/Emotion, police Roboto, ThemeProvider, CssBaseline et AppLayout | PR [#15](https://github.com/louis-stintzy/crz-project/pull/15) |
-| 6B — MUI : compte utilisateur | ⏭ Prochain | LoginPage, RegisterPage, ProfilePage et confirmation de suppression en MUI ; préserver les flux API | `feat/mui-user-forms` (proposition) |
-| 6C — MUI : gestion des placards | Prévu | Liste des placards, création, édition, suppression avec confirmation ; connexion au CRUD PostgreSQL | Branche à définir |
-| 6D — MUI : harmonisation UI | Prévu | Navigation, notifications globales, états chargement/erreur/vide, responsive et cohérence visuelle | Branche à définir |
+| 6B — MUI : compte utilisateur | ✅ Fusionné | Login/Register/Profile, confirmation de suppression et Alert typées ; flux API préservés | PR [#16](https://github.com/louis-stintzy/crz-project/pull/16) |
+| 6C — MUI : gestion des placards | ⏭ Prochain | Liste des placards réels, création, édition, suppression confirmée et tests E2E PostgreSQL | `feat/mui-closet-crud` (proposition) |
+| 6D — Upload : photo de profil | Prévu | Étude de Multer + S3, stockage de la clé objet, récupération sécurisée et remplacement de photo ; décider si Redis est utile | Branche à définir |
+| 6E — MUI : harmonisation UI | Prévu | Navigation, états chargement/erreur/vide, responsive et cohérence visuelle | Branche à définir |
 | 7 — CRUD Clothing Item backend | Reporté | Remplacer le prototype en mémoire par le modèle SQL réel avec ownership hérité du placard | Branche à définir |
 | 8 — Clothing Item frontend | Prévu | Lister, ajouter, modifier, supprimer les vêtements d'un placard | Branche à définir |
 | 9 — Tags, catégories, recherche | Prévu | Gestion et filtrage des vêtements/tenues | À préciser |
 | 10 — Outfits | Prévu | Créer des tenues à partir des vêtements, les afficher et les retrouver | À préciser |
-| 11 — Images et finition | Exploratoire | Photos, UX, tests renforcés et préparation éventuelle au déploiement | À préciser |
+| 11 — Images des vêtements | Prévu | Réutiliser l'upload du profil pour clothing_picture : plusieurs images, couverture et suppression | À préciser |
+| 12 — Finition et déploiement | Exploratoire | Tests renforcés, UX, sécurité et déploiement VPS | À préciser |
 
-Les sous-lots 6A à 6D forment un **chantier UI unique**, mais restent séparables en petites PR pédagogiques. Le lot 7 est délibérément reporté afin de privilégier les cours consacrés au frontend.
+Les sous-lots 6A à 6E sont des étapes pédagogiques distinctes : les travaux UI encadrent un lot autonome consacré au stockage des images. Le lot 7 est délibérément reporté pour privilégier le frontend.
 
 ## Prochaine action concrète
 
-**Lot 6B — Formulaires du compte utilisateur avec Material UI**, à partir de `dev`, sur `feat/mui-user-forms` (nom proposé).
+**Lot 6C — Gestion des placards réels avec Material UI**, depuis `dev`, branche proposée `feat/mui-closet-crud`.
 
-Le lot 6A est fusionné via la PR #15. Ne pas modifier l'authentification backend ni les services API pour un changement d'apparence.
+Le lot 6B est fusionné par la PR #16. Le frontend conserve un ancien `ClosetManager.tsx` dont le modèle `{ isOpen, clothes }` est un prototype en mémoire : **ne pas confondre ce prototype et l'entité SQL `closet`**.
 
-1. **6B.1 — LoginPage :** remplacer le formulaire HTML par `Paper`, `Stack`, `Typography`, `TextField` et `Button` ; préserver `useAuth().login()`, les erreurs et les transitions.
-2. **6B.2 — RegisterPage :** mêmes composants et disposition ; conserver `useAuth().register()`, les champs, contraintes de saisie, états chargement et gestion des erreurs `400/409`.
-3. **6B.3 — ProfilePage :** reprendre le même style pour le formulaire de profil ; préserver la mise à jour des données et le comportement lors d'une session expirée.
-4. **6B.4 — Suppression et vérification :** utiliser un `Dialog` MUI pour confirmer la suppression du compte, avec libellés explicites et état de chargement. Vérifier le clavier, les erreurs affichées, l'accessibilité et le responsive.
-5. Vérifier `npm run lint`, `npm run build` et les parcours login/register/profile/logout/delete dans le navigateur, puis faire une PR vers `dev`. Mettre à jour cette roadmap après fusion.
+Découper le travail en petites étapes validables :
+1. **6C.1 — Contrats et lecture :** types frontend `Closet` alignés sur la réponse API, `closet.service.ts` Axios, composant de liste avec GET `/api/v1/closets`, état de chargement/vide/erreur.
+2. **6C.2 — Création :** formulaire MUI (nom obligatoire, description facultative), POST `/api/v1/closets`, rafraîchissement de liste et gestion de `409`.
+3. **6C.3 — Édition :** formulaire MUI prérempli, PATCH `/api/v1/closets/:id`, erreurs `400/404/409`.
+4. **6C.4 — Suppression :** confirmation MUI explicite ; DELETE avec avertissement sur la cascade SQL des vêtements.
+5. **6C.5 — Vérifications :** `npm run lint` et `npm run build` frontend, parcours navigateur → API → PostgreSQL, rechargement persistant et contrôle d'accès entre deux utilisateurs. Review Codex puis PR vers `dev`.
 
-**Principes :** conserver les fichiers `components/auth/LoginPage.tsx`, `RegisterPage.tsx` et `components/user/ProfilePage.tsx`. Extraire un composant commun uniquement si un véritable besoin de réutilisation apparaît. Ne pas imposer un nouveau routeur, une bibliothèque de formulaires ou un état global supplémentaire dans ce lot.
+**Périmètre strict :** les placards de la base PostgreSQL, pas encore les vêtements, photos ou outfits. Conserver les services Auth et le thème. Éviter les abstractions de formulaires et routeurs non nécessaires. Mettre de côté ou isoler clairement l'ancien prototype `ClosetManager` pour ne pas entretenir deux représentations concurrentes du placard.
 
-**Lot 6C ensuite :** ajouter un service frontend `closet`, ses types et des formulaires MUI pour lister/créer/modifier/supprimer les placards. Les tests E2E Closet sont réservés à ce lot, avec vérification des droits entre deux comptes.
+**Lot 6D ensuite — Upload photo de profil :** étudier directement un stockage objet S3 avec Multer/`multer-s3`, plutôt qu'une étape de stockage local destinée à être abandonnée. Conserver la clé de l'objet en base et produire une URL d'accès selon la politique de confidentialité retenue. Les URL présignées expirent : ne pas les conserver comme référence durable en base. Redis n'est **pas un prérequis** ; mesurer ou justifier le besoin de cache avant de l'introduire. Ne jamais présumer qu'un upload vers S3 est sécurisé sans validation du fichier, contrôle d'accès, limites de taille, secrets hors dépôt et nettoyage des fichiers remplacés.
 
 ## Vérifications et dette technique
 
@@ -92,7 +95,7 @@ Le lot 6A est fusionné via la PR #15. Ne pas modifier l'authentification backen
 - **Conflits PostgreSQL :** traiter de manière homogène les violations `23505` pour email/pseudo, y compris en accès concurrent.
 - **Session / sécurité :** revoir les options de cookie, CORS, CSRF et la politique de renouvellement des tokens avant déploiement. Ne pas interpréter le fonctionnement local comme une garantie de sécurité en production.
 - **Suppression en cascade :** supprimer un placard supprime ses vêtements associés selon le schéma SQL ; ajouter une confirmation UI explicite.
-- **Frontend :** `ProfilePage` est incluse dans le lot 6B. Une navigation par routes pourra être envisagée plus tard à la place des booléens de vues dans `App.tsx`.
+- **Frontend :** les formulaires MUI du compte et les Alert sont fusionnés via PR #16 ; une navigation par routes pourra être envisagée plus tard à la place des booléens de vues dans `App.tsx`.
 - **Vite :** exclure `.vite/` du suivi Git (cache local de préoptimisation des dépendances).
 - **Tests :** pas encore de suite automatisée significative pour ce backend ; prévoir progressivement tests de services/API et vérifications de non-régression.
 
@@ -102,7 +105,8 @@ Le lot 6A est fusionné via la PR #15. Ne pas modifier l'authentification backen
 - Règles fonctionnelles des placards : nombre maximal, placard par défaut, comportement si le dernier placard est supprimé.
 - Catalogues de catégories et sous-catégories ; tags personnalisés et filtrage.
 - Données d'une tenue : sélection de plusieurs vêtements, recherche, multi-placards.
-- Gestion du stockage des photos et des couvertures.
+- Upload photo de profil prévu après le CRUD Closet frontend : choix du bucket, clés d'objet, URL publiques ou présignées, remplacement et suppression, coût et stratégie de cache éventuelle.
+- Réutilisation ultérieure de cette logique pour les photos de vêtements et les couvertures.
 - Stratégie de tests et éventuel déploiement public.
 
 ## Convention de mise à jour
