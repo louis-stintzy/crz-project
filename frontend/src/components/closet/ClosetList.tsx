@@ -1,12 +1,21 @@
 import { useEffect, useState } from "react";
-import { Box, CircularProgress, Paper, Stack, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Paper,
+  Stack,
+  Typography,
+} from "@mui/material";
 import { closetService } from "../../services/closet.service";
 import type { ClosetEntity } from "../../types/closetEntity.types";
+import CreateClosetDialog from "./CreateClosetDialog";
 
 function ClosetList() {
   const [closets, setClosets] = useState<ClosetEntity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -31,16 +40,35 @@ function ClosetList() {
     };
   }, []);
 
+  const handleClosetCreated = (closet: ClosetEntity) => {
+    setClosets((currentClosets) => [closet, ...currentClosets]);
+    setErrorMessage(null);
+    setIsCreateDialogOpen(false);
+  };
+
   return (
     <Stack spacing={3}>
-      <Box>
-        <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
-          Your closets
-        </Typography>
-        <Typography color="text.secondary">
-          Find the wardrobes linked to your account.
-        </Typography>
-      </Box>
+      <Stack
+        direction={{ xs: "column", sm: "row" }}
+        spacing={2}
+        sx={{ alignItems: { xs: "stretch", sm: "center" }, justifyContent: "space-between" }}
+      >
+        <Box>
+          <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
+            Your closets
+          </Typography>
+          <Typography color="text.secondary">
+            Find the wardrobes linked to your account.
+          </Typography>
+        </Box>
+        <Button
+          variant="contained"
+          onClick={() => setIsCreateDialogOpen(true)}
+          disabled={isLoading}
+        >
+          Add closet
+        </Button>
+      </Stack>
 
       {isLoading ? (
         <Box
@@ -87,6 +115,12 @@ function ClosetList() {
           ))}
         </Stack>
       )}
+
+      <CreateClosetDialog
+        isOpen={isCreateDialogOpen}
+        onClose={() => setIsCreateDialogOpen(false)}
+        onClosetCreated={handleClosetCreated}
+      />
     </Stack>
   );
 }

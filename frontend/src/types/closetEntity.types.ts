@@ -6,3 +6,8 @@ export interface ClosetEntity {
   createdAt: string;
   updatedAt: string | null;
 }
+
+export interface CreateClosetInput {
+  name: string;
+  description?: string | null;
+}
