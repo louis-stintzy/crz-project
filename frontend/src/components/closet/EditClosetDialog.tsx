@@ -34,6 +34,10 @@ function EditClosetDialog({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const hasChanges =
+    name.trim() !== closet.name ||
+    (description.trim() || null) !== closet.description;
+
   const handleClose = () => {
     if (!isLoading) onClose();
   };
@@ -58,7 +62,6 @@ function EditClosetDialog({
       setIsLoading(true);
       setErrorMessage(null);
       const updatedCloset = await closetService.updateById(closet.id, data);
-      setIsLoading(false);
       onClosetUpdated(updatedCloset);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 400) {
@@ -70,6 +73,7 @@ function EditClosetDialog({
       } else {
         setErrorMessage("Unable to update the closet. Please try again.");
       }
+    } finally {
       setIsLoading(false);
     }
   };
@@ -112,12 +116,16 @@ function EditClosetDialog({
           <Button type="button" onClick={handleClose} disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit" variant="contained" disabled={isLoading}>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={isLoading || !hasChanges}
+            sx={{ minWidth: 140 }}
+          >
             {isLoading ? (
-              <CircularProgress size={24} color="inherit" />
-            ) : (
-              "Save changes"
-            )}
+              <CircularProgress size={20} color="inherit" sx={{ mr: 1 }} />
+            ) : null}
+            Save changes
           </Button>
         </DialogActions>
       </Box>
