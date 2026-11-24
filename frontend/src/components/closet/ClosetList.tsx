@@ -10,12 +10,14 @@ import {
 import { closetService } from "../../services/closet.service";
 import type { ClosetEntity } from "../../types/closetEntity.types";
 import CreateClosetDialog from "./CreateClosetDialog";
+import EditClosetDialog from "./EditClosetDialog";
 
 function ClosetList() {
   const [closets, setClosets] = useState<ClosetEntity[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [closetToEdit, setClosetToEdit] = useState<ClosetEntity | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -26,7 +28,9 @@ function ClosetList() {
         if (isMounted) setClosets(data);
       } catch {
         if (isMounted) {
-          setErrorMessage("Unable to load your closets. Please try again later.");
+          setErrorMessage(
+            "Unable to load your closets. Please try again later.",
+          );
         }
       } finally {
         if (isMounted) setIsLoading(false);
@@ -46,12 +50,24 @@ function ClosetList() {
     setIsCreateDialogOpen(false);
   };
 
+  const handleClosetUpdated = (updatedCloset: ClosetEntity) => {
+    setClosets((currentClosets) =>
+      currentClosets.map((closet) =>
+        closet.id === updatedCloset.id ? updatedCloset : closet,
+      ),
+    );
+    setClosetToEdit(null);
+  };
+
   return (
     <Stack spacing={3}>
       <Stack
         direction={{ xs: "column", sm: "row" }}
         spacing={2}
-        sx={{ alignItems: { xs: "stretch", sm: "center" }, justifyContent: "space-between" }}
+        sx={{
+          alignItems: { xs: "stretch", sm: "center" },
+          justifyContent: "space-between",
+        }}
       >
         <Box>
           <Typography component="h1" variant="h4" sx={{ fontWeight: 700 }}>
@@ -87,10 +103,7 @@ function ClosetList() {
           <Typography color="error.main">{errorMessage}</Typography>
         </Paper>
       ) : closets.length === 0 ? (
-        <Paper
-          elevation={0}
-          sx={{ border: 1, borderColor: "divider", p: 3 }}
-        >
+        <Paper elevation={0} sx={{ border: 1, borderColor: "divider", p: 3 }}>
           <Typography variant="h6">No closets yet</Typography>
           <Typography color="text.secondary">
             Your closets will appear here once you create one.
@@ -105,12 +118,34 @@ function ClosetList() {
               elevation={0}
               sx={{ border: 1, borderColor: "divider", p: { xs: 2.5, sm: 3 } }}
             >
-              <Typography component="h2" variant="h6" sx={{ fontWeight: 700 }}>
-                {closet.name}
-              </Typography>
-              <Typography color="text.secondary">
-                {closet.description ?? "No description provided."}
-              </Typography>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                sx={{
+                  alignItems: { xs: "stretch", sm: "flex-start" },
+                  justifyContent: "space-between",
+                }}
+              >
+                <Box>
+                  <Typography
+                    component="h2"
+                    variant="h6"
+                    sx={{ fontWeight: 700 }}
+                  >
+                    {closet.name}
+                  </Typography>
+                  <Typography color="text.secondary">
+                    {closet.description ?? "No description provided."}
+                  </Typography>
+                </Box>
+                <Button
+                  variant="outlined"
+                  onClick={() => setClosetToEdit(closet)}
+                  aria-label={`Edit ${closet.name}`}
+                >
+                  Edit
+                </Button>
+              </Stack>
             </Paper>
           ))}
         </Stack>
@@ -121,6 +156,14 @@ function ClosetList() {
         onClose={() => setIsCreateDialogOpen(false)}
         onClosetCreated={handleClosetCreated}
       />
+
+      {closetToEdit && (
+        <EditClosetDialog
+          closet={closetToEdit}
+          onClose={() => setClosetToEdit(null)}
+          onClosetUpdated={handleClosetUpdated}
+        />
+      )}
     </Stack>
   );
 }

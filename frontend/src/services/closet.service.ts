@@ -1,6 +1,7 @@
 import type {
   ClosetEntity,
   CreateClosetInput,
+  UpdateClosetInput,
 } from "../types/closetEntity.types";
 import { axiosInstance } from "./axiosInstance";
 
@@ -14,7 +15,19 @@ const create = async (data: CreateClosetInput): Promise<ClosetEntity> => {
   return response.data;
 };
 
+const updateById = async (
+  id: string,
+  data: UpdateClosetInput,
+): Promise<ClosetEntity> => {
+  const response = await axiosInstance.patch<ClosetEntity>(
+    `/closets/${id}`,
+    data,
+  );
+  return response.data;
+};
+
 export const closetService = {
   getAll,
   create,
+  updateById,
 };

@@ -11,3 +11,8 @@ export interface CreateClosetInput {
   name: string;
   description?: string | null;
 }
+
+export interface UpdateClosetInput {
+  name?: string;
+  description?: string | null;
+}
