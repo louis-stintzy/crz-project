@@ -64,7 +64,9 @@ function EditClosetDialog({
       const updatedCloset = await closetService.updateById(closet.id, data);
       onClosetUpdated(updatedCloset);
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 400) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        return;
+      } else if (axios.isAxiosError(error) && error.response?.status === 400) {
         setErrorMessage("The closet information is invalid.");
       } else if (axios.isAxiosError(error) && error.response?.status === 404) {
         setErrorMessage("This closet no longer exists.");

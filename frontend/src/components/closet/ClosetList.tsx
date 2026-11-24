@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -26,8 +27,10 @@ function ClosetList() {
       try {
         const data = await closetService.getAll();
         if (isMounted) setClosets(data);
-      } catch {
-        if (isMounted) {
+      } catch (error) {
+        const isUnauthorized =
+          axios.isAxiosError(error) && error.response?.status === 401;
+        if (isMounted && !isUnauthorized) {
           setErrorMessage(
             "Unable to load your closets. Please try again later.",
           );

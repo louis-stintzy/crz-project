@@ -69,7 +69,9 @@ function CreateClosetDialog({
       resetForm();
       onClosetCreated(createdCloset);
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 409) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        return;
+      } else if (axios.isAxiosError(error) && error.response?.status === 409) {
         setErrorMessage("A closet with this name already exists.");
       } else {
         setErrorMessage("Unable to create the closet. Please try again.");

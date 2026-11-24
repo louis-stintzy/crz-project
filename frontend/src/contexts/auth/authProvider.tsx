@@ -8,6 +8,7 @@ import { AuthContext } from "./authContext";
 import { authService } from "../../services/auth.service";
 import type { LoginInput, RegisterInput } from "../../types/auth.types";
 import axios from "axios";
+import { axiosInstance } from "../../services/axiosInstance";
 import { useNotification } from "../notification/useNotification";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -15,6 +16,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [currentUser, setCurrentUser] = useState<AppUserPublic | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
+
+  useEffect(() => {
+    const interceptorId = axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        const requestUrl = axios.isAxiosError(error)
+          ? error.config?.url
+          : undefined;
+        const isPublicAuthRequest =
+          requestUrl === "/auth/login" || requestUrl === "/auth/register";
+
+        if (
+          axios.isAxiosError(error) &&
+          error.response?.status === 401 &&
+          currentUser !== null &&
+          !isPublicAuthRequest
+        ) {
+          setCurrentUser(null);
+          showMessage(
+            "Your session has expired. Please log in again.",
+            "error",
+          );
+        }
+
+        return Promise.reject(error);
+      },
+    );
+
+    return () => {
+      axiosInstance.interceptors.response.eject(interceptorId);
+    };
+  }, [currentUser, showMessage]);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -83,17 +116,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       showMessage("Profile updated successfully!", "success");
     } catch (error) {
       console.error("Error updating profile:", error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        throw error;
+      }
       if (axios.isAxiosError(error) && error.response?.status === 400) {
         showMessage("The profile information is invalid.", "error");
         throw error;
       }
-      if (
-        axios.isAxiosError(error) &&
-        (error.response?.status === 401 || error.response?.status === 404)
-      ) {
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
         setCurrentUser(null);
         showMessage(
-          `Your session has expired. Your profile has not been updated. Please log in again.`,
+          "Your account could not be found. Please log in again.",
           "error",
         );
         throw error;
@@ -120,13 +153,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       showMessage("Your account has been deleted successfully.", "success");
     } catch (error) {
       console.error("Delete account failed:", error);
-      if (
-        axios.isAxiosError(error) &&
-        (error.response?.status === 401 || error.response?.status === 404)
-      ) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        throw error;
+      }
+      if (axios.isAxiosError(error) && error.response?.status === 404) {
         setCurrentUser(null);
         showMessage(
-          `Your session has expired. Your account was not deleted. Please log in again.`,
+          "Your account could not be found. It may already have been deleted.",
           "error",
         );
         throw error;
@@ -146,6 +179,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       showMessage("You are logged out.", "info");
     } catch (error) {
       console.error(error);
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        return;
+      }
       showMessage(
         "You are not properly logged out. Please log in again and then log out.",
         "error",
