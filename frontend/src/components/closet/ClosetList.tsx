@@ -11,6 +11,7 @@ import {
 import { closetService } from "../../services/closet.service";
 import type { ClosetEntity } from "../../types/closetEntity.types";
 import CreateClosetDialog from "./CreateClosetDialog";
+import DeleteClosetDialog from "./DeleteClosetDialog";
 import EditClosetDialog from "./EditClosetDialog";
 
 function ClosetList() {
@@ -19,6 +20,9 @@ function ClosetList() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [closetToEdit, setClosetToEdit] = useState<ClosetEntity | null>(null);
+  const [closetToDelete, setClosetToDelete] = useState<ClosetEntity | null>(
+    null,
+  );
 
   useEffect(() => {
     let isMounted = true;
@@ -60,6 +64,13 @@ function ClosetList() {
       ),
     );
     setClosetToEdit(null);
+  };
+
+  const handleClosetDeleted = (closetId: string) => {
+    setClosets((currentClosets) =>
+      currentClosets.filter((closet) => closet.id !== closetId),
+    );
+    setClosetToDelete(null);
   };
 
   return (
@@ -141,13 +152,23 @@ function ClosetList() {
                     {closet.description ?? "No description provided."}
                   </Typography>
                 </Box>
-                <Button
-                  variant="outlined"
-                  onClick={() => setClosetToEdit(closet)}
-                  aria-label={`Edit ${closet.name}`}
-                >
-                  Edit
-                </Button>
+                <Stack direction="row" spacing={1}>
+                  <Button
+                    variant="outlined"
+                    onClick={() => setClosetToEdit(closet)}
+                    aria-label={`Edit ${closet.name}`}
+                  >
+                    Edit
+                  </Button>
+                  <Button
+                    variant="outlined"
+                    color="error"
+                    onClick={() => setClosetToDelete(closet)}
+                    aria-label={`Delete ${closet.name}`}
+                  >
+                    Delete
+                  </Button>
+                </Stack>
               </Stack>
             </Paper>
           ))}
@@ -165,6 +186,14 @@ function ClosetList() {
           closet={closetToEdit}
           onClose={() => setClosetToEdit(null)}
           onClosetUpdated={handleClosetUpdated}
+        />
+      )}
+
+      {closetToDelete && (
+        <DeleteClosetDialog
+          closet={closetToDelete}
+          onClose={() => setClosetToDelete(null)}
+          onClosetDeleted={handleClosetDeleted}
         />
       )}
     </Stack>

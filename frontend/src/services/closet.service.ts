@@ -26,8 +26,13 @@ const updateById = async (
   return response.data;
 };
 
+const deleteById = async (id: string): Promise<void> => {
+  await axiosInstance.delete<void>(`/closets/${id}`);
+};
+
 export const closetService = {
   getAll,
   create,
   updateById,
+  deleteById,
 };
