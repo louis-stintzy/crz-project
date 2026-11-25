@@ -1,6 +1,6 @@
 # Closet Manager — Roadmap
 
-> Document vivant du projet. Dernière mise à jour : 2026-11-12.
+> Document vivant du projet. Dernière mise à jour : 2026-11-25.
 >
 > **Source de vérité :** les lots déclarés « terminés » correspondent aux fonctionnalités présentes dans les PR fusionnées dans `dev`. Une fusion ne prouve pas, à elle seule, la validation complète en conditions réelles. Les vérifications et limites connues sont signalées séparément.
 >
@@ -57,8 +57,8 @@ Objectifs progressifs :
 | 5 — CRUD Closet backend | ✅ Fusionné | Routes, Zod, SQL PostgreSQL, contrôles de propriété, mapper, documentation | PR [#14](https://github.com/louis-stintzy/crz-project/pull/14) |
 | 6A — MUI : fondations | ✅ Fusionné | MUI/Emotion, police Roboto, ThemeProvider, CssBaseline et AppLayout | PR [#15](https://github.com/louis-stintzy/crz-project/pull/15) |
 | 6B — MUI : compte utilisateur | ✅ Fusionné | Login/Register/Profile, confirmation de suppression et Alert typées ; flux API préservés | PR [#16](https://github.com/louis-stintzy/crz-project/pull/16) |
-| 6C — MUI : gestion des placards | ⏭ Prochain | Liste des placards réels, création, édition, suppression confirmée et tests E2E PostgreSQL | `feat/mui-closet-crud` (proposition) |
-| 6D — Upload : photo de profil | Prévu | Étude de Multer + S3, stockage de la clé objet, récupération sécurisée et remplacement de photo ; décider si Redis est utile | Branche à définir |
+| 6C — MUI : gestion des placards | ✅ Fusionné | Liste, création, édition, suppression confirmée ; vérifications navigateur rapportées, sans preuve exhaustive des scénarios E2E/cascade SQL | PR [#17](https://github.com/louis-stintzy/crz-project/pull/17) |
+| 6D — Upload : photo de profil | 🔧 En préparation (6D.1) | S3 privé, clé persistée en SQL, URL présignée renouvelable, upload sécurisé et avatar disponible dans l'application | `feat/profile-picture-upload` — [architecture](./profile-picture-architecture.md) |
 | 6E — MUI : harmonisation UI | Prévu | Navigation, états chargement/erreur/vide, responsive et cohérence visuelle | Branche à définir |
 | 7 — CRUD Clothing Item backend | Reporté | Remplacer le prototype en mémoire par le modèle SQL réel avec ownership hérité du placard | Branche à définir |
 | 8 — Clothing Item frontend | Prévu | Lister, ajouter, modifier, supprimer les vêtements d'un placard | Branche à définir |
@@ -71,30 +71,30 @@ Les sous-lots 6A à 6E sont des étapes pédagogiques distinctes : les travaux U
 
 ## Prochaine action concrète
 
-**Lot 6C — Gestion des placards réels avec Material UI**, depuis `dev`, branche proposée `feat/mui-closet-crud`.
+**Lot 6D — Photo de profil avec stockage Amazon S3**, sur la branche `feat/profile-picture-upload` dérivée de `dev`.
 
-Le lot 6B est fusionné par la PR #16. Le frontend conserve un ancien `ClosetManager.tsx` dont le modèle `{ isOpen, clothes }` est un prototype en mémoire : **ne pas confondre ce prototype et l'entité SQL `closet`**.
+La PR [#17](https://github.com/louis-stintzy/crz-project/pull/17) a été fusionnée dans `dev` le 25 novembre 2026 (commit de fusion `a66a327`). Le lot 6C contient désormais GET/POST/PATCH/DELETE côté React/MUI et l'intercepteur Axios stabilisé. Les tests complets de suppression en cascade et de contrôle d'accès sur deux comptes ne sont pas réputés acquis sans rapport de test explicite.
 
-Découper le travail en petites étapes validables :
-1. **6C.1 — Contrats et lecture :** types frontend `Closet` alignés sur la réponse API, `closet.service.ts` Axios, composant de liste avec GET `/api/v1/closets`, état de chargement/vide/erreur.
-2. **6C.2 — Création :** formulaire MUI (nom obligatoire, description facultative), POST `/api/v1/closets`, rafraîchissement de liste et gestion de `409`.
-3. **6C.3 — Édition :** formulaire MUI prérempli, PATCH `/api/v1/closets/:id`, erreurs `400/404/409`.
-4. **6C.4 — Suppression :** confirmation MUI explicite ; DELETE avec avertissement sur la cascade SQL des vêtements.
-5. **6C.5 — Vérifications :** `npm run lint` et `npm run build` frontend, parcours navigateur → API → PostgreSQL, rechargement persistant et contrôle d'accès entre deux utilisateurs. Review Codex puis PR vers `dev`.
+**Décisions 6D.1 validées par l'utilisateur :** Amazon S3, objets privés, consultation via URL présignées, périmètre limité à la photo de profil. Redis n'est pas retenu. Le code devra permettre un avatar **visible en permanence** dans l'interface connectée (en-tête/AppLayout), ouvrant à terme un menu de compte ; il ne sera donc pas limité à `ProfilePage`. Document de référence : [profile-picture-architecture.md](./profile-picture-architecture.md).
 
-**Périmètre strict :** les placards de la base PostgreSQL, pas encore les vêtements, photos ou outfits. Conserver les services Auth et le thème. Éviter les abstractions de formulaires et routeurs non nécessaires. Mettre de côté ou isoler clairement l'ancien prototype `ClosetManager` pour ne pas entretenir deux représentations concurrentes du placard.
+Découpage et critères de validation :
+1. **6D.1 — Architecture et stockage (en cours) :** documenter le contrat API et SQL, la politique de confidentialité, les règles d'expiration/renouvellement, les risques d'orphelins S3, les accès AWS et les tests. Préparer un bucket privé avec budget/alertes et identité IAM de moindre privilège. Pas d'upload codé à ce stade.
+2. **6D.2 — Backend : upload initial :** `multipart/form-data` avec `checkAuth()`, Multer avec limites, validation de contenu et normalisation d'image, `PutObject` via AWS SDK v3, nouvelle clé d'objet, persistance en base et tests API.
+3. **6D.3 — Backend : lecture et cycle de vie :** endpoint pour URL `GetObject` présignée et date d'expiration, remplacement/suppression avec nettoyage des objets S3, gestion des échecs partiels et suppression de compte. Une migration SQL est nécessaire pour les installations existantes.
+4. **6D.4 — Frontend : photo et avatar global :** sélection/aperçu/upload dans `ProfilePage`, consultation de l'URL depuis un composant partagé (en-tête), actualisation anticipée ou à la reprise de l'application avant expiration, invalidation au logout et après remplacement/suppression, fallback sur les initiales et menu de compte minimal ou ultérieur.
+5. **6D.5 — Validation :** scénarios 401/403/404, format/taille invalides, remplacement et suppression, URL expirée, multi-comptes, rafraîchissement de page, maintien de l'avatar visible, vérification S3/SQL, lint/build, documentation et review avant PR.
 
-**Lot 6D ensuite — Upload photo de profil :** étudier directement un stockage objet S3 avec Multer/`multer-s3`, plutôt qu'une étape de stockage local destinée à être abandonnée. Conserver la clé de l'objet en base et produire une URL d'accès selon la politique de confidentialité retenue. Les URL présignées expirent : ne pas les conserver comme référence durable en base. Redis n'est **pas un prérequis** ; mesurer ou justifier le besoin de cache avant de l'introduire. Ne jamais présumer qu'un upload vers S3 est sécurisé sans validation du fichier, contrôle d'accès, limites de taille, secrets hors dépôt et nettoyage des fichiers remplacés.
+**Périmètre strict :** ne pas développer encore `clothing_picture`, les tenues, un cache Redis ou une infrastructure de tâches. Le formulaire actuel accepte une URL `pictureUrl` ; il faudra retirer cette entrée libre du PATCH utilisateur, décider du traitement des anciennes valeurs et exposer une URL de lecture éphémère séparée de la clé persistée.
 
 ## Vérifications et dette technique
 
-- **Lot 5 :** `npm run build` backend réussi le 2026-11-10 (vérification locale rapportée). Review Codex sans remarque bloquante et PR #14 fusionnée. **CRUD Closet E2E non encore validé** ; à vérifier au lot 6C.
+- **Lot 5 / 6C :** build backend du 2026-11-10 et PR #14 ; PR #17 fusionnée. Ne pas confondre tests manuels rapportés et couverture E2E automatisée ou validation explicite de la cascade SQL et des accès multi-utilisateurs.
 - **Backend lint :** `npm run check` échoue actuellement sur quatre `await` inutiles dans `backend/src/repositories/clothes.repository.ts` (prototype en mémoire). Corriger ces expressions lors d'un petit correctif indépendant ; ne pas ignorer durablement l'échec de la commande globale.
 - **CRUD /clothes :** en mémoire et fondé sur un ancien modèle (`type`, `style`, `isFavorite`) non aligné avec `clothing_item` SQL. À remplacer lors du lot 7, sans l'utiliser comme vraie persistance.
 - **Authorization admin :** les routes `/users` et `/users/:id` sont authentifiées mais pas encore restreintes à un rôle admin ; sécuriser avant exposition publique.
 - **Conflits PostgreSQL :** traiter de manière homogène les violations `23505` pour email/pseudo, y compris en accès concurrent.
 - **Session / sécurité :** revoir les options de cookie, CORS, CSRF et la politique de renouvellement des tokens avant déploiement. Ne pas interpréter le fonctionnement local comme une garantie de sécurité en production.
-- **Suppression en cascade :** supprimer un placard supprime ses vêtements associés selon le schéma SQL ; ajouter une confirmation UI explicite.
+- **Suppression en cascade :** confirmation UI implémentée ; la cascade SQL supprime des lignes en base mais jamais les objets S3. Prévoir le nettoyage lors des futurs uploads de vêtements et lors de la suppression de compte.
 - **Frontend :** les formulaires MUI du compte et les Alert sont fusionnés via PR #16 ; une navigation par routes pourra être envisagée plus tard à la place des booléens de vues dans `App.tsx`.
 - **Vite :** exclure `.vite/` du suivi Git (cache local de préoptimisation des dépendances).
 - **Tests :** pas encore de suite automatisée significative pour ce backend ; prévoir progressivement tests de services/API et vérifications de non-régression.
@@ -105,7 +105,7 @@ Découper le travail en petites étapes validables :
 - Règles fonctionnelles des placards : nombre maximal, placard par défaut, comportement si le dernier placard est supprimé.
 - Catalogues de catégories et sous-catégories ; tags personnalisés et filtrage.
 - Données d'une tenue : sélection de plusieurs vêtements, recherche, multi-placards.
-- Upload photo de profil prévu après le CRUD Closet frontend : choix du bucket, clés d'objet, URL publiques ou présignées, remplacement et suppression, coût et stratégie de cache éventuelle.
+- Upload photo de profil : décisions S3 privé + URL présignées + clé persistée validées ; préciser les droits IAM, le bucket, la migration des anciennes URL et le mécanisme de renouvellement de l'avatar global.
 - Réutilisation ultérieure de cette logique pour les photos de vêtements et les couvertures.
 - Stratégie de tests et éventuel déploiement public.
 
