@@ -1,22 +1,37 @@
-import { useEffect, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import type {
   AppUserPublic,
   UpdateAppUserInput,
 } from "../../types/appUser.types";
-import { appUserService } from "../../services/appUser.service";
-import { AuthContext } from "./authContext";
-import { authService } from "../../services/auth.service";
 import type { LoginInput, RegisterInput } from "../../types/auth.types";
+import { appUserService } from "../../services/appUser.service";
+import { authService } from "../../services/auth.service";
 import axios from "axios";
 import { axiosInstance } from "../../services/axiosInstance";
+import { AuthContext } from "./authContext";
 import { useNotification } from "../notification/useNotification";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { showMessage, clearMessage } = useNotification();
 
   const [currentUser, setCurrentUser] = useState<AppUserPublic | null>(null);
+  const currentUserRef = useRef<AppUserPublic | null>(null);
   const [isLoadingAuth, setIsLoadingAuth] = useState(true);
 
+  const updateCurrentUser = useCallback((user: AppUserPublic | null) => {
+    currentUserRef.current = user;
+    setCurrentUser(user);
+  }, []);
+
+  // ----- Handle expired sessions -----
+  // Les dépendances stables empêchent la réinstallation de l'intercepteur
+  // à chaque fois que l'utilisateur authentifié ou la notification change.
   useEffect(() => {
     const interceptorId = axiosInstance.interceptors.response.use(
       (response) => response,
@@ -30,10 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (
           axios.isAxiosError(error) &&
           error.response?.status === 401 &&
-          currentUser !== null &&
+          currentUserRef.current !== null &&
           !isPublicAuthRequest
         ) {
-          setCurrentUser(null);
+          updateCurrentUser(null);
           showMessage(
             "Your session has expired. Please log in again.",
             "error",
@@ -47,27 +62,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       axiosInstance.interceptors.response.eject(interceptorId);
     };
-  }, [currentUser, showMessage]);
+  }, [showMessage, updateCurrentUser]);
 
+  // ----- Restore session -----
   useEffect(() => {
     const fetchCurrentUser = async () => {
       try {
         const user: AppUserPublic = await appUserService.getMe();
-        setCurrentUser(user);
+        updateCurrentUser(user);
       } catch {
-        setCurrentUser(null);
+        updateCurrentUser(null);
       } finally {
         setIsLoadingAuth(false);
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [updateCurrentUser]);
 
   // ----- Register -----
   const register = async (data: RegisterInput) => {
     try {
       await authService.register(data);
-      setCurrentUser(null);
+      updateCurrentUser(null);
       showMessage(
         "Account created successfully. You can now log in.",
         "success",
@@ -94,11 +110,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const login = async (data: LoginInput) => {
     try {
       const user: AppUserPublic = await authService.login(data);
-      setCurrentUser(user);
+      updateCurrentUser(user);
       clearMessage();
     } catch (error) {
       console.error("Login failed:", error);
-      setCurrentUser(null);
+      updateCurrentUser(null);
       if (axios.isAxiosError(error) && error.response?.status === 401) {
         showMessage("Invalid credentials. Please try again.", "error");
         throw error;
@@ -112,7 +128,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const updateProfile = async (data: UpdateAppUserInput) => {
     try {
       const updatedUser: AppUserPublic = await appUserService.updateMe(data);
-      setCurrentUser(updatedUser);
+      updateCurrentUser(updatedUser);
       showMessage("Profile updated successfully!", "success");
     } catch (error) {
       console.error("Error updating profile:", error);
@@ -124,7 +140,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
       if (axios.isAxiosError(error) && error.response?.status === 404) {
-        setCurrentUser(null);
+        updateCurrentUser(null);
         showMessage(
           "Your account could not be found. Please log in again.",
           "error",
@@ -149,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const deleteAccount = async () => {
     try {
       await appUserService.deleteMe();
-      setCurrentUser(null);
+      updateCurrentUser(null);
       showMessage("Your account has been deleted successfully.", "success");
     } catch (error) {
       console.error("Delete account failed:", error);
@@ -157,7 +173,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         throw error;
       }
       if (axios.isAxiosError(error) && error.response?.status === 404) {
-        setCurrentUser(null);
+        updateCurrentUser(null);
         showMessage(
           "Your account could not be found. It may already have been deleted.",
           "error",
@@ -187,8 +203,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         "error",
       );
     } finally {
-      // note: Regardless of whether the logout request succeeds or fails, we clear the current user state to ensure the user is logged out on the client side.
-      setCurrentUser(null);
+      // Regardless of whether the logout request succeeds or fails, we clear the current user state to ensure the user is logged out on the client side.
+      updateCurrentUser(null);
     }
   };
 
