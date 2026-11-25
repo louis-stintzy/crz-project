@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import type {
   Notification,
   NotificationSeverity,
@@ -8,13 +8,17 @@ import { NotificationContext } from "./notificationContext";
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notification, setNotification] = useState<Notification | null>(null);
 
-  const showMessage = (message: string, severity: NotificationSeverity) => {
-    setNotification({ message, severity });
-  };
+  // doit rester stable, utilisé par l'intercepteur axios
+  const showMessage = useCallback(
+    (message: string, severity: NotificationSeverity) => {
+      setNotification({ message, severity });
+    },
+    [],
+  );
 
-  const clearMessage = () => {
+  const clearMessage = useCallback(() => {
     setNotification(null);
-  };
+  }, []);
 
   return (
     <NotificationContext

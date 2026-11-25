@@ -1,0 +1,18 @@
+export interface ClosetEntity {
+  id: string;
+  userId: string;
+  name: string;
+  description: string | null;
+  createdAt: string;
+  updatedAt: string | null;
+}
+
+export interface CreateClosetInput {
+  name: string;
+  description?: string | null;
+}
+
+export interface UpdateClosetInput {
+  name?: string;
+  description?: string | null;
+}
