@@ -36,6 +36,14 @@ const envSchema = z.object({
   JWT_ACCESS_TOKEN_SECRET: z
     .string()
     .min(1, { message: 'JWT_ACCESS_TOKEN_SECRET is required' }),
+
+  // AWS S3 configuration
+  AWS_REGION: z.string().min(1, { message: 'AWS_REGION is required' }),
+
+  S3_BUCKET_NAME: z
+    .string()
+    .min(3, { message: 'S3_BUCKET_NAME is required' })
+    .max(63, { message: 'S3_BUCKET_NAME must contain at most 63 characters' }),
 });
 
 export type Env = z.infer<typeof envSchema>;
