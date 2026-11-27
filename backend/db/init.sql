@@ -20,6 +20,7 @@ CREATE TABLE app_user (
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     picture_url VARCHAR(255),
+    picture_key TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ
 );
